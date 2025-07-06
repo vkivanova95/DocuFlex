@@ -1,0 +1,35 @@
+# created by virtualenv automatically
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Django
+*.log
+*.sqlite3
+db.sqlite3
+db_backups/
+media/
+static/
+
+# Environment
+.env
+.venv/
+venv/
+env/
+
+# IDE settings
+.idea/
+.vscode/
+
+# Optional: миграции
+ **/migrations/*.py
+ **/migrations/*.pyc
+ !**/migrations/__init__.py
+
+ # Tests / coverage
+.coverage
+htmlcov/
+

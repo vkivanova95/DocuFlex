@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% load static %}
+{% if form.non_field_errors %}
+        <div class="alert alert-danger">
+        {{ form.non_field_errors }}
+        </div>
+    {% endif %}
+
+{% block content %}
+
+<div class="card shadow-sm p-4">
+    <h4 class="custom-header">
+    {% if object %}Редакция на клиентски данни{% else %}Въвеждане на клиентски данни{% endif %}
+    </h4>
+    <form method="post">
+        {% csrf_token %}
+        
+    <div class="text-start">    
+        <!-- ОСНОВНИ ДАННИ -->
+        <h5 class="mt-4">🏢 Основни данни</h5>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="id_eik" class="form-label">ЕИК</label>
+                {% if form.fields.eik.required %}<span class="text-danger">*</span>{% endif %}
+                {{ form.eik }}
+                {{ form.eik.errors }}
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="id_name" class="form-label">Име на фирмата</label>
+                {% if form.fields.name.required %}<span class="text-danger">*</span>{% endif %}
+                {{ form.name }}
+                {{ form.eik.name.errors }}
+            </div>
+        </div>
+
+        <!-- АДРЕС -->
+        <h5 class="mt-4">🏠 Адрес</h5>
+        <!-- Първи ред -->
+        <div class="row">
+            <div class="col-md-3 mb-3">
+                <label for="id_town" class="form-label">Град</label>
+                {% if form.fields.town.required %}<span class="text-danger">*</span>{% endif %}
+                {{ form.town }}
+                {{ form.town.errors }}
+            </div>
+            <div class="col-md-3 mb-3">
+                <label for="id_district" class="form-label">Квартал</label>
+                {{ form.district }}
+                {{ form.district.errors }}
+            </div>
+            <div class="col-md-3 mb-3">
+                <label for="id_district" class="form-label">Улица</label>
+                {{ form.district }}
+                {{ form.district.errors }}
+            </div>
+            <div class="col-md-3 mb-3">
+                <label for="id_number" class="form-label">Номер</label>
+                {{ form.number }}
+                {{ form.number.errors }}
+            </div>
+        </div>
+
+        <!-- Втори ред -->
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label for="id_block" class="form-label">Блок</label>
+                {{ form.block }}
+                {{ form.block.errors }}
+            </div>
+            <div class="col-md-4 mb-3">
+                <label for="id_floor" class="form-label">Етаж</label>
+                {{ form.floor }}
+                {{ form.floor.errors }}
+            </div>
+            <div class="col-md-4 mb-3">
+                <label for="id_apartment" class="form-label">Апартамент</label>
+                {{ form.apartment }}
+                {{ form.apartment.errors }}
+            </div>
+        </div>
+
+        <!-- ПРЕДСТАВЛЯВАНЕ -->
+        <h5 class="mt-4">👥 Представляване</h5>
+        <div class="form-check form-switch mb-3">
+            {{ form.represented_together }}
+            <label class="form-check-label" for="id_represented_together">
+                Представлява се съвместно от двама
+            </label>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="id_representative1" class="form-label">Представляващ 1</label>
+                {% if form.fields.representative1.required %}<span class="text-danger">*</span>{% endif %}
+                {{ form.representative1 }}
+                {{ form.representative1.errors }}
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="id_representative2" class="form-label">Представляващ 2</label>
+                {{ form.representative2 }}
+                {{ form.representative2.errors }}
+            </div>
+            <div class="form-check mb-3">
+              {{ form.is_active }}
+              <label class="form-check-label" for="{{ form.is_active.id_for_label }}">
+                  Действащ клиент
+              </label>
+            </div>    
+        </div>
+
+    </div>
+        <div class="text-center mt-4">
+            <button type="submit" class="btn btn-primary">Запиши данните</button>
+        </div>
+    </form>
+</div>
+    
+    <p class="text-muted small">
+        <span class="text-danger">*</span> Полетата са задължителни.
+    </p>    
+{% endblock %}
