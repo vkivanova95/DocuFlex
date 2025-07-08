@@ -8,6 +8,7 @@
 
 {% block content %}
 
+<div class="container">
 <div class="card shadow-sm p-4">
     <h4 class="custom-header">
     {% if object %}Редакция на клиентски данни{% else %}Въвеждане на клиентски данни{% endif %}
@@ -117,5 +118,6 @@
     
     <p class="text-muted small">
         <span class="text-danger">*</span> Полетата са задължителни.
-    </p>    
+    </p>
+</div>
 {% endblock %}

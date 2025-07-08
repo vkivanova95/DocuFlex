@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="card shadow-sm p-4">
+    <h4 class="custom-header"> Преглед на договори</h4>
+
+ <form method="get" class="mb-3 d-flex justify-content-end align-items-center gap-2">
+        <label for="per_page" class="form-label mb-0">Покажи по:</label>
+        <select name="per_page" id="per_page" class="form-select w-auto" onchange="this.form.submit()">
+            <option value="5" {% if request.GET.per_page == '5' %}selected{% endif %}>5</option>
+            <option value="10" {% if request.GET.per_page == '10' or not request.GET.per_page %}selected{% endif %}>10</option>
+            <option value="20" {% if request.GET.per_page == '20' %}selected{% endif %}>20</option>
+            <option value="all" {% if request.GET.per_page == 'all' %}selected{% endif %}>Всички</option>
+        </select>
+</form>
+
+<form method="get" class="mb-3 d-flex justify-content-end">
+        <input type="text" name="search" value="{{ search_query }}" class="form-control me-2" placeholder="Търси по ЕИК или Номер на договор">
+        <button type="submit" class="btn btn-primary">🔍</button>
+    </form>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Договор №</th>
+      <th>Дата</th>
+      <th>Валута</th>
+      <th>Сума</th>
+      <th>Име</th>
+      <th>ЕИК</th>
+      <th>Статус</th>
+      <th>Действия</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for contract in contracts %}
+      <tr>
+        <td>{{ contract.contract_number }}</td>
+        <td>{{ contract.start_date }}</td>
+        <td>{{ contract.currency }}</td>
+        <td>{{ contract.amount }}</td>
+        <td>{{ contract.client.name }}</td>
+        <td>{{ contract.client.eik }}</td>
+        <td>
+          {% if contract.is_active %}
+            <span class="badge bg-success">Активен</span>
+          {% else %}
+            <span class="badge bg-secondary">Неактивен</span>
+          {% endif %}
+        </td>
+        <td>
+          <a href="{% url 'contracts:contract_edit' contract.pk %}" class="btn btn-sm btn-outline-primary">✏️ Редакция</a>
+          <form method="post" action="{% url 'contracts:deactivate' contract.pk %}" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Наистина ли искате да деактивирате този договор?')">🗑️ Деактивация</button>
+          </form>
+        </td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="5">Няма намерени договори.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% include "pagination.html" with page_obj=page_obj %}
+</div>
+{% endblock %}

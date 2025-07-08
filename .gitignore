@@ -19,6 +19,8 @@ static/
 .venv/
 venv/
 env/
+.env.*
+.vscode/
 
 # IDE settings
 .idea/

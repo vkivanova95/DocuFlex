@@ -19,7 +19,7 @@ class Client(models.Model):
         help_text="Единен идентификационен код (само цифри)."
     )
     name = models.CharField(max_length=255, verbose_name="Наименование на дружеството")
-    town = models.ForeignKey(Town, on_delete=models.SET_NULL, null=True, verbose_name="град         ")
+    town = models.ForeignKey(Town, on_delete=models.SET_NULL, null=True, verbose_name="град")
     district = models.CharField(max_length=255, blank=True, verbose_name="квартал")
     street = models.CharField(max_length=255, blank=True, verbose_name="улица")
     number = models.CharField(max_length=10, blank=True, verbose_name="номер")

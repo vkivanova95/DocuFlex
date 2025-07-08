@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block content %}
+<div class="container mt-5">
+  <h4>Избери договор за редакция</h4>
+  <p>Клиент: {{ client.name }}</p>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Номер</th>
+        <th>Дата</th>
+        <th>Валута</th>
+        <th>Сума</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for contract in contracts %}
+      <tr>
+        <td>{{ contract.contract_number }}</td>
+        <td>{{ contract.start_date }}</td>
+        <td>{{ contract.currency }}</td>
+        <td>{{ contract.amount|floatformat:2|intcomma }}</td>
+        <td>
+          <a href="{% url 'contracts:contract_edit' contract.pk %}" class="btn btn-sm btn-outline-primary">✏️ Редакция</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

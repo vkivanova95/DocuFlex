@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+{% load static %}
+{% if form.non_field_errors %}
+        <div class="alert alert-danger">
+        {{ form.non_field_errors }}
+        </div>
+    {% endif %}
+
+{% block content %}
+
+<div class="container">
+<div class="card shadow-sm p-4">
+    <h4 class="custom-header">
+    {% if object %}Редакция на договор {% else %}Добавяне на нов договор{% endif %}
+    </h4>
+
+<form method="post">
+  {% csrf_token %}
+
+<div class="text-start">
+
+<!-- ОСНОВНИ ДАННИ -->
+    <h4 class="custom-header">
+    <h5 class="mt-4">🏢 Основни данни</h5>
+    <div class="row">
+         <div class="col-md-6 mb-3">
+            <label for="id_eik" class="form-label">ЕИК</label>
+            {% if form.fields.eik.required %}<span class="text-danger">*</span>{% endif %}
+            {{ form.eik }}
+            {{ form.eik.errors }}
+        </div>
+        <div class="col-md-6 mb-3">
+            <label for="id_name" class="form-label">Име на фирмата</label>
+            {{ form.name }}
+            {{ form.name.errors }}
+        </div>
+    </div>
+
+<!-- ДАННИ ЗА КРЕДИТА -->
+    <h5 class="mt-4">💶 Параметри на кредита</h5>
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label for="id_contract_number" class="form-label">Договор номер</label>
+            {% if form.fields.contract_number.required %}<span class="text-danger">*</span>{% endif %}
+            {{ form.contract_number }}
+            {{ form.contract_number.errors }}
+        </div>
+        <div class="col-md-6 mb-3">
+            <label for="id_start_date" class="form-label">Дата</label>
+            {% if form.fields.start_date.required %}<span class="text-danger">*</span>{% endif %}
+            {{ form.start_date }}
+            {{ form.start_date.errors }}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <label for="id_loan_type" class="form-label">Вид на кредита</label>
+            {{ form.loan_type }}
+            {{ form.loan_type.errors }}
+        </div>
+         <div class="col-md-3 mb-3">
+          <label for="id_currency" class="form-label">Валута</label>
+          {% if form.fields.currency.required %}<span class="text-danger">*</span>{% endif %}
+          {{ form.currency }}
+          {{ form.currency.errors }}
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <label for="id_amount" class="form-label">Сума</label>
+            {% if form.fields.amount.required %}<span class="text-danger">*</span>{% endif %}
+            {{ form.amount }}
+            {{ form.amount.errors }}
+        </div>
+
+    <div class="form-check mb-3">
+      {{ form.is_active }}
+      <label class="form-check-label" for="{{ form.is_active.id_for_label }}">
+          Активен договор
+      </label>
+    </div>
+
+    </div>
+    <div class="text-center">
+      <button type="submit" class="btn btn-primary px-4">Запиши договора</button>
+    </div>
+</div>
+</form>
+</div>
+    <p class="text-muted small mt-3">
+        <span class="text-danger">*</span> Полетата са задължителни.
+    </p>
+</div>
+
+<script>
+  const eikField = document.getElementById('id_eik');
+  const nameField = document.getElementById('client_name');
+
+  if (eikField && nameField) {
+    eikField.addEventListener('change', function () {
+      const eik = eikField.value;
+
+      fetch(`/contracts/get-client-name/?eik=${eik}`)
+        .then(response => {
+          if (!response.ok) throw new Error();
+          return response.json();
+        })
+        .then(data => {
+          if (data.name) {
+            nameField.value = data.name;
+          } else {
+            nameField.value = 'Клиентът не е намерен';
+          }
+        })
+        .catch(() => {
+          nameField.value = 'Грешка при зареждане';
+        });
+    });
+  }
+</script>
+
+
+
+{% endblock %}
+

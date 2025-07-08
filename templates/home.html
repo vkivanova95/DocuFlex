@@ -36,9 +36,9 @@
                 </div>
                 <div class="card-body d-none" id="contracts-menu">
                     <ul class="list-unstyled">
-                        <li><a href="#">➕ Добавяне договор</a></li>
-                        <li><a href="#">✏️ Редакция договор</a></li>
-                        <li><a href="#">🔍 Преглед договори</a></li>
+                        <li><a href="{% url 'contracts:create' %}">➕ Добавяне договор</a></li>
+                        <li><a href="{% url 'contracts:contract_eik_lookup' %}">✏️ Редакция договор</a></li>
+                        <li><a href="{% url 'contracts:list' %}">🔍 Преглед договори</a></li>
                     </ul>
                 </div>
             </div>
