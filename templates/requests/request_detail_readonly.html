@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block content %}
+<div class="card shadow-sm p-4">
+    <h4 class="custom-header">Преглед на заявка</h4>
+<p>
+
+</p>
+
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <label class="form-label">Номер на заявка</label>
+            <input type="text" class="form-control" value="{{ request_obj.request_number }}" disabled>
+        </div>
+        <div class="col-md-4 mb-3">
+            <label class="form-label">Изпълнител</label>
+            {% if request_obj.maker %}
+                <input type="text" class="form-control" value="{{ request_obj.maker.get_full_name|default:request_obj.maker.username }}" disabled>
+            {% else %}
+                <input type="text" class="form-control text-muted" value="няма" disabled>
+            {% endif %}
+        </div>
+          <div class="col-md-4 mb-3">
+            <label class="form-label">Статус</label>
+            <input type="text" class="form-control" value="{{ request_obj.get_status_display }}" disabled>
+          </div>
+    </div>
+    <p>
+
+    </p>
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Клиент</label>
+            <input type="text" class="form-control" value="{{ request_obj.client.name }}" disabled>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label class="form-label">ЕИК</label>
+            <input type="text" class="form-control" value="{{ request_obj.client.eik }}" disabled>
+        </div>
+    </div>
+    <p>
+
+    </p>
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Договор №</label>
+            <input type="text" class="form-control" value="{{ request_obj.loan_agreement.contract_number }}" disabled>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Сума</label>
+            <input type="text" class="form-control" value="{{ request_obj.amount }} {{ request_obj.currency }}" disabled>
+        </div>
+    </div>
+    <p>
+
+    </p>
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Вид документ</label>
+            <input type="text" class="form-control" value="{{ request_obj.get_document_type_display }}" disabled>
+        </div>
+    </div>
+    <p>
+
+    </p>
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <label class="form-label">Дата изготвяне</label>
+            <input type="text" class="form-control" value="{{ request_obj.preparation_date|default:"—"  }}" disabled>
+        </div>
+        <div class="col-md-4 mb-3">
+            <label class="form-label">Корекции по анекса</label>
+            <input type="text" class="form-control" value="{{ request_obj.correction_required|default:"—" }}" disabled>
+        </div>
+        <div class="col-md-4 mb-3">
+            <label class="form-label">Дата подпис</label>
+            <input type="text" class="form-control" value="{{ request_obj.signing_date|default:"—" }}" disabled>
+        </div>
+    </div>
+    <p>
+
+    </p>
+    <div class="col-md-2">
+        <a href="{% url 'requests:request_list_all' %}" class="btn btn-primary w-100">Назад</a>
+    </div>
+
+</div>
+{% endblock %}

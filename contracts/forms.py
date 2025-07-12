@@ -54,6 +54,16 @@ class ContractForm(BaseStyledForm):
         # добавяне на placeholder към дата
         self.fields['start_date'].widget.attrs['placeholder'] = 'ГГГГ-ММ-ДД'
 
+        # ако клиентът се инициализира с client_id
+        client_id = self.initial.get('client_id')
+        if client_id and not self.instance.pk:
+            try:
+                client = Client.objects.get(id=client_id)
+                self.fields['eik'].initial = client.eik
+                self.fields['name'].initial = client.name
+                self.fields['eik'].disabled = True
+            except Client.DoesNotExist:
+                pass
 
     def clean_contract_number(self):
         contract_number = self.cleaned_data.get('contract_number')

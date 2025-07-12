@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="card shadow-sm p-4">
+    <h4 class="text-center mb-4">Въведете ЕИК на клиента</h4>
+    <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+            {{ form.eik.label_tag }}
+            {{ form.eik }}
+            {{ form.eik.errors }}
+        </div>
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary">Продължи</button>
+        </div>
+    </form>
+
+{% if error %}
+  <p style="color:red;">{{ error }}</p>
+{% endif %}
+
+{% if inactive_client %}
+    <p style="color:red;">Клиент с този ЕИК съществува, но е неактивен.</p>
+    <a href="{% url 'clients:edit' client_id %}?return_to=requests:request_add">Редактиране на клиент</a>
+{% elif client_not_found %}
+    <p style="color:red;">Клиент с този ЕИК не съществува.</p>
+    <a href="{% url 'clients:create' %}?eik={{ eik }}&return_to=requests:request_add">Регистриране на нов клиент</a>
+{% endif %}
+
+{% if show_create_contract %}
+  <p><a href="{% url 'contracts:create' %}?client_id={{ client_id }}">Регистриране на договор за този клиент</a></p>
+{% endif %}
+
+{% endblock %}

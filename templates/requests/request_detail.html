@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="card shadow-sm p-4">
+    <h4 class="custom-header">Обработване на заявка</h4>
+
+
+<h5 class="mt-4">📋 Детайли по заявката</h5>
+    <div class="row">
+        <div class="col-md-3 mb-3">
+            <label class="form-label">Номер на заявка</label>
+            <input type="text" class="form-control" value="{{ object.request_number }}" disabled>
+        </div>
+        <div class="col-md-3 mb-3">
+            <label class="form-label">Изпълнител</label>
+            <input type="text" class="form-control" value="{{ object.maker.get_full_name|default:object.maker.username }}" disabled>
+        </div>
+          <div class="col-md-3 mb-3">
+            <label class="form-label">Клиент</label>
+            <input type="text" class="form-control" value="{{ object.client.name }}" disabled>
+        </div>
+        <div class="col-md-3 mb-3">
+            <label class="form-label">ЕИК</label>
+            <input type="text" class="form-control" value="{{ object.client.eik }}" disabled>
+        </div>
+    </div>
+
+     <div class="row">
+        <div class="col-md-3 mb-3">
+            <label class="form-label">Договор №</label>
+            <input type="text" class="form-control" value="{{ object.loan_agreement.contract_number }}" disabled>
+        </div>
+        <div class="col-md-3 mb-3">
+            <label class="form-label">Валута</label>
+            <input type="text" class="form-control" value="{{ object.loan_agreement.currency }}" disabled>
+        </div>
+        <div class="col-md-3 mb-3">
+            <label class="form-label">Сума</label>
+            <input type="text" class="form-control" value="{{ object.loan_agreement.amount }}" disabled>
+        </div>
+         <div class="col-md-3 mb-3">
+            <label class="form-label">Вид документ</label>
+            <input type="text" class="form-control" value="{{ object.get_document_type_display }}" disabled>
+        </div>
+    </div>
+
+<p>
+
+</p>
+
+<form method="post">
+    {% csrf_token %}
+    <h5 class="mb-3">✏️ Попълване от изпълнител:</h5>
+     <div class="row">
+        <div class="col-md-6 mb-3">
+            <label for="id_preparation_date" class="form-label">Дата на изготвяне:</label>
+            {{ form.preparation_date }}
+        </div>
+        <div class="col-md-6 mb-3">
+            <label for="id_signing_date" class="form-label">Дата на подпис:</label>
+            {{ form.signing_date }}
+        </div>
+         <div class="col-md-6 mb-3">
+            <label for="id_correction_required" class="form-label">Корекции по документа:</label>
+            {{ form.correction_required }}
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label for="id_status" class="form-label">Статус:</label>
+             {{ form.status }}
+        </div>
+    </div>
+
+    <div class="text-center">
+      <button type="submit" class="btn btn-primary px-4">Запис</button>
+    </div>
+    <a href="{% url 'requests:assigned_requests' %}" class="btn btn-secondary">Назад</a>
+</form>
+</div>
+{% endblock %}

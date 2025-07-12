@@ -24,6 +24,7 @@ urlpatterns = [
     path('clients/', include('clients.urls', namespace='clients')),
     path('', include('common.urls')),
     path('contracts/', include('contracts.urls', namespace='contracts')),
+    path('requests/', include(('requests.urls', 'requests'), namespace='requests')),
 
 
 ]

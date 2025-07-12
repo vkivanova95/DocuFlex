@@ -24,6 +24,19 @@ class ContractCreateView(CreateView):
         messages.success(self.request, "Договорът беше успешно записан.")
         return super().form_valid(form)
 
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        if 'client' in form.fields:
+            form.fields['client'].disabled = True
+        return form
+
+    def get_initial(self):
+        initial = super().get_initial()
+        client_id = self.request.GET.get('client_id')
+        if client_id:
+            initial['client_id'] = client_id
+        return initial
+
 
 class GetClientNameView(View):
     def get(self, request):
@@ -74,6 +87,7 @@ class ContractUpdateView(SuccessMessageMixin, UpdateView):
         # self.object = form.save()
         # return redirect('home')
         return super().form_valid(form)
+
 
 
 class ContractListView(ListView):

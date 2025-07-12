@@ -53,8 +53,10 @@
                 </div>
                 <div class="card-body d-none" id="requests-menu">
                     <ul class="list-unstyled">
-                        <li><a href="#">➕ Нова заявка</a></li>
-                        <li><a href="#">📋 Всички заявки</a></li>
+                        <li><a href="{% url 'requests:request_add' %}">➕ Нова заявка</a></li>
+                        <li><a href="{% url 'requests:assign_requests' %}">✏️ Разпределяне на заявки</a></li>
+                        <li><a href="{% url 'requests:assigned_requests' %}">📋 Обработка на заявки</a></li>
+                        <li><a href="{% url 'requests:request_list_all' %}">🔍 Преглед заявки</a></li>
                     </ul>
                 </div>
             </div>

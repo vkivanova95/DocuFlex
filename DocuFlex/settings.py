@@ -35,6 +35,7 @@ PROJECT_APPS = [
     'common',
     'clients',
     'contracts',
+    'requests',
 ]
 
 INSTALLED_APPS = [

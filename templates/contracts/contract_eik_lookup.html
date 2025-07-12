@@ -1,19 +1,9 @@
 {% extends 'base.html' %}
 
 {% block content %}
-{#<div class="container mt-5">#}
-{#  <div class="card p-4">#}
-{#    <h4 class="mb-3">Въведи ЕИК на клиента</h4>#}
-{#    <form method="post">#}
-{#      {% csrf_token %}#}
-{#      {{ form.as_p }}#}
-{#      <button type="submit" class="btn btn-primary">Продължи</button>#}
-{#    </form>#}
-{#  </div>#}
-{#</div>#}
 
 <div class="card shadow-sm p-4">
-    <h4 class="text-center mb-4">Въведи ЕИК на клиента</h4>
+    <h4 class="text-center mb-4">Въведете ЕИК на клиента</h4>
     <form method="post">
         {% csrf_token %}
         <div class="mb-3">

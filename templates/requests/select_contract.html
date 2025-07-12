@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block content %}
+<div class="card shadow-sm p-4">
+    <h4 class="custom-header mb-4">Изберете договор, по който да се изготви анекс</h4>
+
+         <div class="row">
+         <div class="col-md-4 mb-3">
+                <label for="clientEIK" class="form-label"><strong>ЕИК:</strong></label>
+                <input type="text" class="form-control" id="clientEIK" value="{{ client.eik }}" readonly>
+         </div>
+           <div class="col-md-4 mb-3">
+                <label for="clientName" class="form-label"><strong>Клиент:</strong></label>
+                <input type="text" class="form-control" id="clientName" value="{{ client.name }}" readonly>
+            </div>
+
+    <form method="post" action="{% url 'requests:request_finalize' %}" class="needs-validation" novalidate>
+        {% csrf_token %}
+        <input type="hidden" name="client_id" value="{{ client.id }}">
+
+        <div class="form-group mb-3">
+            <label for="contract" class="form-label"><strong>Изберете договор</strong></label>
+            <select name="loan_agreement_id" id="contract" class="form-select" required>
+                <option value="" disabled selected>-- Изберете договор --</option>
+                {% for contract in contracts %}
+                    <option value="{{ contract.id }}">
+                        № {{ contract.contract_number }} | {{ contract.currency }} {{ contract.amount|intcomma }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+       <div class="text-center">
+      <button type="submit" class="btn btn-primary px-4">Продължи</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

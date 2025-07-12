@@ -4,7 +4,7 @@
         <div class="alert alert-danger">
         {{ form.non_field_errors }}
         </div>
-    {% endif %}
+{% endif %}
 
 {% block content %}
 
@@ -25,7 +25,7 @@
                 {% if form.fields.eik.required %}<span class="text-danger">*</span>{% endif %}
                 {{ form.eik }}
                 {{ form.eik.errors }}
-            </div>
+        </div>
             <div class="col-md-6 mb-3">
                 <label for="id_name" class="form-label">Име на фирмата</label>
                 {% if form.fields.name.required %}<span class="text-danger">*</span>{% endif %}

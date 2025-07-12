@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="card shadow-sm p-4">
+    <h4 class="custom-header mb-4">Изберете вид анекс, който да се изготви по зададения клиент и договор</h4>
+
+    <form method="post" action="{% url 'requests:request_submit' %}" class="needs-validation" novalidate>
+        {% csrf_token %}
+
+        <div class="row">
+             <div class="col-md-4 mb-3">
+                <label for="clientEIK" class="form-label">ЕИК:</label>
+                <input type="text" class="form-control" id="clientEIK" value="{{ client.eik }}" readonly>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label for="clientName" class="form-label">Клиент:</label>
+                <input type="text" class="form-control" id="clientName" value="{{ client.name }}" readonly>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label for="contractNumber" class="form-label">Договор №:</label>
+                <input type="text" class="form-control" id="contractNumber" value="{{ loan_agreement.contract_number }}" readonly>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Валута:</label>
+                <input type="text" class="form-control" value="{{ currency }}" readonly>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Сума:</label>
+                <input type="text" class="form-control" value="{{ amount }}" readonly>
+            </div>
+        </div>
+
+        <div class="mb-3">
+        <label for="document_type" class="form-label">Вид анекс:</label>
+            {{ form.document_type }}
+            {% if form.document_type.errors %}
+                <div class="text-danger">{{ form.document_type.errors }}</div>
+            {% endif %}
+        </div>
+
+        <!-- Скритите полета -->
+        <input type="hidden" name="client" value="{{ client.id }}">
+        <input type="hidden" name="loan_agreement" value="{{ loan_agreement.id }}">
+        <input type="hidden" name="amount" value="{{ amount }}">
+        <input type="hidden" name="currency" value="{{ currency }}">
+
+        <div class="text-center">
+      <button type="submit" class="btn btn-primary px-4">Запис</button>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

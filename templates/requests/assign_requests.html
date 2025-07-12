@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card p-4 shadow-sm">
+    <h4 class="mb-4">Неразпределени заявки</h4>
+
+    <form method="post">
+        {% csrf_token %}
+
+         <div class="row align-items-end">
+            <div class="col-md-6 mb-3">
+              <label for="makerSelect" class="form-label">Изберете изпълнител:</label>
+              <select class="form-select" name="maker" id="makerSelect" required>
+                <option value="" disabled selected>-- Изберете --</option>
+                {% for user in executors %}
+                  <option value="{{ user.id }}">{{ user.get_full_name|default:user.username }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="col-md-3 mb-3 d-flex align-items-end">
+              <button type="submit" class="btn btn-primary w-100">Разпредели</button>
+            </div>
+          </div>
+
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th scope="col"><input type="checkbox" id="select-all"></th>
+                    <th scope="col">Заявка №</th>
+                    <th scope="col">Клиент</th>
+                    <th scope="col">ЕИК</th>
+                    <th scope="col">Договор №</th>
+                    <th scope="col">Валута</th>
+                    <th scope="col">Сума</th>
+                    <th scope="col">Вид анекс</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for request in pending_requests %}
+                <tr>
+                    <td><input type="checkbox" name="selected_requests" value="{{ request.id }}"></td>
+                    <td>{{ request.request_number }}</td>
+                    <td>{{ request.client.name }}</td>
+                    <td>{{ request.client.eik }}</td>
+                    <td>{{ request.loan_agreement.contract_number }}</td>
+                    <td>{{ request.currency }}</td>
+                    <td>{{ request.amount }}</td>
+                    <td>{{ request.get_document_type_display }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+
+    </form>
+
+</div>
+
+
+<script>
+    // "Избери всички"
+    document.getElementById('select-all').addEventListener('change', function() {
+        const checkboxes = document.querySelectorAll('input[name="selected_requests"]');
+        checkboxes.forEach(cb => cb.checked = this.checked);
+    });
+</script>
+
+{% endblock %}

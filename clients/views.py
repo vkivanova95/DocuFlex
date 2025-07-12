@@ -3,7 +3,7 @@ from django.db.models import Q
 from django.shortcuts import render
 from django.views import View
 from django.views.generic import CreateView, UpdateView, ListView
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from .models import Client
 from .forms import ClientForm, EIKLookupForm
 from django.contrib import messages
@@ -22,6 +22,12 @@ class ClientCreateView(SuccessMessageMixin, CreateView):
         form.instance.is_active = True
         return super().form_valid(form)
 
+    def get_initial(self):
+        initial = super().get_initial()
+        eik = self.request.GET.get('eik')
+        if eik:
+            initial['eik'] = eik
+        return initial
 
 class ClientUpdateView(SuccessMessageMixin, UpdateView):
     model = Client
@@ -33,6 +39,11 @@ class ClientUpdateView(SuccessMessageMixin, UpdateView):
     def form_valid(self, form):
         return super().form_valid(form)
 
+    def get_success_url(self):
+        return_url = self.request.GET.get('return_to')
+        if return_url:
+            return reverse(return_url)
+        return reverse('home')
 
 
 class ClientEIKLookupView(View):
