@@ -1,0 +1,218 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+  <div class="card shadow-sm p-4">
+    <h4 class="custom-header">Допълване на данни за анекс</h4>
+
+    <form method="post">
+      {% csrf_token %}
+      <input type="hidden" name="annex_type" value="{{ annex_type }}">
+      <input type="hidden" name="step" value="complete">
+
+        <!-- Преглед на основните данни -->
+        <h5 class="mt-4">📄 Данни от заявка</h5>
+        <div class="row">
+          <div class="col-md-3 mb-3">
+            <label class="form-label">Request number:</label>
+            <input type="text" class="form-control" value="{{ form.request_number.value }}" disabled>
+            {{ form.request_number.as_hidden }}
+          </div>
+          <div class="col-md-3 mb-3">
+            <label class="form-label">Annex number:</label>
+            <input type="text" class="form-control" value="{{ form.annex_number.value }}" disabled>
+            {{ form.annex_number.as_hidden }}
+          </div>
+          <div class="col-md-3 mb-3">
+            <label class="form-label">Анекс дата:</label>
+            <input type="text" class="form-control" value="{{ form.annex_date.value }}" disabled>
+            {{ form.annex_date.as_hidden }}
+          </div>
+          <div class="col-md-3 mb-3">
+            <label class="form-label">Град:</label>
+            <input type="text" class="form-control" value="{{ form.city.value }}" disabled>
+            {{ form.city.as_hidden }}
+          </div>
+        </div>
+
+
+
+
+      <!-- Полета за допълване -->
+      {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+          {{ form.non_field_errors }}
+        </div>
+      {% endif %}
+
+        {% if annex_type == 'standard' %}
+            <!-- Тук подреждаш полетата от AnnexStandardForm -->
+          <div class="row">
+          <h5 class="mt-4">I. Промени в размера и валутата на кредита:</h5>
+            <div class="col-md-4 mb-3">
+              <label class="form-label" for="{{ form.new_amount_reduction.id_for_label }}">Сума на намаление</label>
+              {{ form.new_amount_reduction }}
+              {{ form.new_amount_reduction.errors }}
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label" for="{{ form.amount_increase.id_for_label }}">Сума на увеличение</label>
+              {{ form.amount_increase }}
+              {{ form.amount_increase.errors }}
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label" for="{{ form.new_amount_increase.id_for_label }}">Нов размер след увеличение</label>
+              {{ form.new_amount_increase }}
+              {{ form.new_amount_increase.errors }}
+            </div>
+          </div>
+
+        <div class="row">
+            <h5 class="mt-4">II. Промени в условията за усвояване/ ползване на средства от кредита:</h5>
+            <div class="col-md-4 mb-3">
+              <label class="form-label" for="{{ form.stop_disbursement.id_for_label }}">Прекратяване на усвояването</label>
+              {{ form.stop_disbursement }}
+              {{ form.stop_disbursement.errors }}
+            </div>
+        </div>
+
+        <div class="row">
+          <h5 class="mt-4">III. Промени в срокове, ограничения в ползването и начин на погасяване на кредита:</h5>
+            <div class="col-md-4 mb-3">
+              <label class="form-label" for="{{ form.new_disbursement_date.id_for_label }}">Нова дата на усвояване</label>
+              {{ form.new_disbursement_date }}
+              {{ form.new_disbursement_date.errors }}
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label" for="{{ form.new_repayment_date.id_for_label }}">Нова дата на погасяване</label>
+              {{ form.new_repayment_date }}
+              {{ form.new_repayment_date.errors }}
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label" for="{{ form.effective_from.id_for_label }}">Считано от </label>
+              {{ form.effective_from }}
+              {{ form.effective_from.errors }}
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <label class="form-label" for="{{ form.repayment_plan.id_for_label }}">Нов погасителен план</label>
+              {{ form.repayment_plan }}
+              {{ form.repayment_plan.errors }}
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label" for="{{ form.new_ceiling.id_for_label }}">Нов плафон</label>
+              {{ form.new_ceiling }}
+              {{ form.new_ceiling.errors }}
+            </div>
+          </div>
+
+        <div class="row">
+          <h5 class="mt-4">IV. Промени в лихви, такси и комисионни по кредита:</h5>
+            <div class="col-md-4 mb-3">
+              <label class="form-label" for="{{ form.new_interest.id_for_label }}">Нова лихва</label>
+              {{ form.new_interest }}
+              {{ form.new_interest.errors }}
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label" for="{{ form.no_fees.id_for_label }}">Без такси</label>
+              {{ form.no_fees }}
+              {{ form.no_fees.errors }}
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <label class="form-label" for="{{ form.fee_review.id_for_label }}">Такса разглеждане </label>
+              {{ form.fee_review }}
+              {{ form.fee_review.errors }}
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label" for="{{ form.fee_management.id_for_label }}">Такса управление</label>
+              {{ form.fee_management }}
+              {{ form.fee_management.errors }}
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label" for="{{ form.fee_commitment.id_for_label }}">Такса ангажимент</label>
+              {{ form.fee_commitment }}
+              {{ form.fee_commitment.errors }}
+            </div>
+          </div>
+
+        {% elif annex_type == 'deletion' %}
+          <h5 class="mt-4">📄 Допълнителна информация:</h5>
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <label class="form-label" for="{{ form.repaid_amount.id_for_label }}">Погасена сума</label>
+              {{ form.repaid_amount }}
+              {{ form.repaid_amount.errors }}
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label" for="{{ form.deed_number.id_for_label }}">Нотариален акт №</label>
+              {{ form.deed_number }}
+              {{ form.deed_number.errors }}
+            </div>
+            <div class="col-md-4 mb-3">
+              <label class="form-label" for="{{ form.collateral_description.id_for_label }}">Описание обезпечение</label>
+               {{ form.collateral_description }}
+               {{ form.collateral_description.errors }}
+            </div>
+          </div>
+        {% endif %}
+
+
+
+
+        {% if annex_type == 'standard' %}
+          <h5 class="mt-4">V. Други условия:</h5>
+          <div id="formset-area">
+            {{ formset.management_form }}
+            {% for fs_form in formset %}
+              <div class="form-group mb-2">
+                {{ fs_form.text }}
+                {{ fs_form.text.errors }}
+              </div>
+            {% endfor %}
+          </div>
+          <button type="button" id="add-form" class="btn btn-secondary mt-2">+ Добави ред</button>
+        {% endif %}
+
+    <!-- Скрито подаване на данните от стартовата форма -->
+    <input type="hidden" name="request_number" value="{{ form.request_number.value }}">
+    <input type="hidden" name="annex_number" value="{{ form.annex_number.value }}">
+    <input type="hidden" name="annex_date" value="{{ form.annex_date.value|date:'d-m-Y' }}">
+    <input type="hidden" name="city" value="{{ form.city.value }}">
+
+      <div class="text-center mt-4">
+        <button type="submit" class="btn btn-primary">Генерирай анекс</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  const formsetArea = document.getElementById('formset-area');
+  const totalForms = document.getElementById('id_form-TOTAL_FORMS');
+  const addFormBtn = document.getElementById('add-form');
+
+  if (addFormBtn) {
+    addFormBtn.addEventListener('click', function () {
+      const currentFormCount = parseInt(totalForms.value);
+      const lastForm = formsetArea.querySelector('.form-group');  // 👈 точно това търси
+      const newForm = lastForm.cloneNode(true);
+
+      // Изчистване на стойността
+      const input = newForm.querySelector('input');
+      if (input) {
+        input.value = '';
+      }
+
+      // Смяна на индекса (form-0, form-1 и т.н.)
+      const regex = new RegExp(`form-(\\d+)-`, 'g');
+      newForm.innerHTML = newForm.innerHTML.replace(regex, `form-${currentFormCount}-`);
+
+      formsetArea.appendChild(newForm);
+      totalForms.value = currentFormCount + 1;
+    });
+  }
+</script>
+
+{% endblock %}

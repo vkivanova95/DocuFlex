@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+  <div class="card shadow-sm p-4">
+    <h4 class="custom-header">Стартиране на анекс</h4>
+
+    {% if start_form.non_field_errors %}
+      <div class="alert alert-danger">
+        {{ start_form.non_field_errors }}
+      </div>
+    {% endif %}
+
+    <form method="post">
+      {% csrf_token %}
+      <div class="row">
+        <div class="col-md-3 mb-3">
+          <label class="form-label" for="{{ start_form.request_number.id_for_label }}">
+            {{ start_form.request_number.label }}
+          </label>
+          {{ start_form.request_number }}
+          {{ start_form.request_number.errors }}
+        </div>
+        <div class="col-md-3 mb-3">
+          <label class="form-label" for="{{ start_form.annex_number.id_for_label }}">
+            {{ start_form.annex_number.label }}
+          </label>
+          {{ start_form.annex_number }}
+          {{ start_form.annex_number.errors }}
+        </div>
+        <div class="col-md-3 mb-3">
+          <label class="form-label" for="{{ start_form.annex_date.id_for_label }}">
+            {{ start_form.annex_date.label }}
+          </label>
+          {{ start_form.annex_date }}
+          {{ start_form.annex_date.errors }}
+        </div>
+        <div class="col-md-3 mb-3">
+          <label class="form-label" for="{{ start_form.city.id_for_label }}">
+            {{ start_form.city.label }}
+          </label>
+          {{ start_form.city }}
+          {{ start_form.city.errors }}
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary">Продължи</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

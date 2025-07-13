@@ -55,10 +55,12 @@
         <div class="col-md-6 mb-3">
             <label for="id_preparation_date" class="form-label">Дата на изготвяне:</label>
             {{ form.preparation_date }}
+            {{ form.preparation_date.errors }}
         </div>
         <div class="col-md-6 mb-3">
             <label for="id_signing_date" class="form-label">Дата на подпис:</label>
             {{ form.signing_date }}
+            {{ form.signing_date.errors }}
         </div>
          <div class="col-md-6 mb-3">
             <label for="id_correction_required" class="form-label">Корекции по документа:</label>

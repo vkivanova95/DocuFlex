@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+  <div class="card shadow-sm p-4">
+    <h4 class="custom-header">Архив на изготвените анекси</h4>
+
+    <form method="get" class="row g-2 mb-4">
+      <div class="col-md-2">
+        <input type="text" name="request_number" value="{{ filters.request_number }}" class="form-control" placeholder="Заявка №">
+      </div>
+      <div class="col-md-2">
+        <input type="text" name="eik" value="{{ filters.eik }}" class="form-control" placeholder="ЕИК">
+      </div>
+      <div class="col-md-2">
+        <input type="text" name="contract_number" value="{{ filters.contract_number }}" class="form-control" placeholder="Договор №">
+      </div>
+
+
+      <div class="col-md-12 text-end mt-2">
+        <button type="submit" class="btn btn-primary">Филтрирай</button>
+        <a href="{% url 'annexes:annex_archive' %}" class="btn btn-secondary">Изчисти</a>
+      </div>
+    </form>
+
+    <table class="table table-bordered table-hover">
+      <thead class="table-light">
+        <tr>
+          <th>Заявка №</th>
+          <th>Клиент</th>
+          <th>ЕИК</th>
+          <th>Договор №</th>
+          <th>Анекс №</th>
+          <th>Дата на генериране</th>
+          <th>Изпълнител</th>
+          <th>Линк</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for annex in annexes %}
+        <tr>
+          <td>{{ annex.request.request_number }}</td>
+          <td>{{ annex.request.client.name }}</td>
+          <td>{{ annex.request.client.eik }}</td>
+          <td>{{ annex.request.loan_agreement.contract_number }}</td>
+          <td>{{ annex.annex_number }}</td>
+          <td>{{ annex.created_at|date:"d.m.Y" }}</td>
+          <td>{{ annex.request.maker.get_full_name|default:annex.request.maker.username }}</td>
+          <td>
+            <a href="{{ annex.file_path.url }}" target="_blank" class="btn btn-sm btn-outline-primary">Преглед</a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="8" class="text-center">Няма анекси по зададените критерии.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    {% include "pagination.html" with page_obj=page_obj %}
+
+{#    <div class="text-end mt-3">#}
+{#      <a href="{% url 'annexes:annexes_export_excel' %}?{{ request.GET.urlencode }}" class="btn btn-success">📤 Експорт в Excel</a>#}
+{#    </div>#}
+  </div>
+</div>
+{% endblock %}

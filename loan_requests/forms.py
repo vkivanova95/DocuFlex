@@ -1,5 +1,3 @@
-# requests/forms.py
-
 from django import forms
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect, render
@@ -8,6 +6,8 @@ from django.urls import reverse_lazy
 from .models import Request
 from contracts.models import Contract
 from common.forms import BaseStyledForm
+from common.forms import styled_datefield
+
 
 class RequestForm(BaseStyledForm):
     class Meta:
@@ -36,14 +36,12 @@ class RequestExecutionForm(BaseStyledForm):
         required=False
     )
 
+    preparation_date = styled_datefield(label='Дата на изготвяне', required=False)
+    signing_date = styled_datefield(label='Дата на подписване', required=False)
+
     class Meta:
         model = Request
         fields = ['preparation_date', 'correction_required', 'signing_date', 'status']
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['preparation_date'].widget.attrs['placeholder'] = 'ДД-ММ-ГГГГ'
-        self.fields['signing_date'].widget.attrs['placeholder'] = 'ДД-ММ-ГГГГ'
 
     def clean_correction_required(self):
         value = self.cleaned_data['correction_required']

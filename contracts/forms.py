@@ -4,7 +4,8 @@ from django.core.exceptions import ValidationError
 from .models import Contract, Currency, LoanType
 from clients.models import Client
 from .validators import validate_active_client
-from common.forms import BaseStyledForm
+from common.forms import BaseStyledForm, styled_datefield
+
 
 
 class ContractForm(BaseStyledForm):
@@ -52,7 +53,8 @@ class ContractForm(BaseStyledForm):
         self.fields['currency'].queryset = Currency.objects.filter(is_active=True)
 
         # добавяне на placeholder към дата
-        self.fields['start_date'].widget.attrs['placeholder'] = 'ГГГГ-ММ-ДД'
+        self.fields['start_date'] = styled_datefield()
+        self.fields['start_date'].widget.attrs['placeholder'] = 'ДД-ММ-ГГГГ'
 
         # ако клиентът се инициализира с client_id
         client_id = self.initial.get('client_id')

@@ -17,6 +17,8 @@ Including another URLconf
 # from django.contrib import admin
 from django.contrib import admin
 from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
 from django.shortcuts import redirect
 
 urlpatterns = [
@@ -24,7 +26,7 @@ urlpatterns = [
     path('clients/', include('clients.urls', namespace='clients')),
     path('', include('common.urls')),
     path('contracts/', include('contracts.urls', namespace='contracts')),
-    path('requests/', include(('requests.urls', 'requests'), namespace='requests')),
+    path('loan_requests/', include(('loan_requests.urls', 'requests'), namespace='requests')),
+    path('annexes/', include('annexes.urls', namespace='annexes')),
 
-
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
