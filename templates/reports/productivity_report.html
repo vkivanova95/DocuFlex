@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+  <div class="card p-4 shadow-sm">
+    <h4 class="mb-3">Справка продуктивност</h4>
+
+    <form method="get" class="row g-2 mb-3">
+      <div class="col-md-4">
+        <label>Начална дата</label>
+{#        <input type="date" name="start_date" value="{{ start_date }}" class="form-control">#}
+        <input type="date" name="start_date" value="{{ start_date|date:'Y-m-d' }}" class="form-control">
+      </div>
+      <div class="col-md-4">
+        <label>Крайна дата</label>
+{#        <input type="date" name="end_date" value="{{ end_date }}" class="form-control">#}
+        <input type="date" name="end_date" value="{{ end_date|date:'Y-m-d' }}" class="form-control">
+      </div>
+      <div class="col-md-4 d-flex align-items-end justify-content-end">
+        <button type="submit" class="btn btn-primary me-2">Филтрирай</button>
+        <button type="submit" name="export" value="1" class="btn btn-success me-2">📤 Excel</button>
+         <a href="{% url 'reports:productivity_report' %}" class="btn btn-secondary">Изчисти</a>
+      </div>
+    </form>
+
+    <table class="table table-bordered table-hover">
+      <thead class="table-light">
+        <tr>
+          <th>Изпълнител</th>
+          <th>Брой заявки</th>
+          <th>Брой анекси</th>
+          <th>Стандартен анекс</th>
+          <th>Анекс за заличаване</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in report_data %}
+        <tr>
+          <td>{{ row.user }}</td>
+          <td>{{ row.requests }}</td>
+          <td>{{ row.annexes }}</td>
+          <td>{{ row.standard }}</td>
+          <td>{{ row.deletion }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="5" class="text-center">Няма данни за избрания период.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

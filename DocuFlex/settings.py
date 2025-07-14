@@ -37,6 +37,7 @@ PROJECT_APPS = [
     'contracts',
     'loan_requests',
     'annexes',
+    'reports',
 ]
 
 INSTALLED_APPS = [
