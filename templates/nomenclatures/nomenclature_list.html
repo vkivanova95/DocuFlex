@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load group_tags %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4 text-center" style="color: #003366;">Управление на номенклатури</h2>
+
+    <div class="row g-4">
+
+        <!-- Валути -->
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-header fw-bold d-flex justify-content-between align-items-center">
+                    <span>💱 Валути</span>
+                    <span class="toggle-icon" style="cursor: pointer;" onclick="toggleMenu('currency-menu')">▼</span>
+                </div>
+                <div class="card-body" id="currency-menu">
+                    <form method="post" class="mb-3">
+                        {% csrf_token %}
+                        <div class="mb-2">
+                            <label for="id_currency_name">Име:</label>
+                            {{ currency_form.currency_name }}
+                        </div>
+                        <div class="mb-2">
+                            <label for="id_currency_code">Код:</label>
+                            {{ currency_form.currency_code }}
+                        </div>
+                        <div class="form-check mb-3">
+                            {{ currency_form.is_active }} <label class="form-check-label" for="id_is_active">Активна</label>
+                        </div>
+                        <button type="submit" name="add_currency" class="btn btn-primary">Добави</button>
+                        <p>
+
+                        </p>
+                        <a href="{% url 'nomenclatures:currency_list' %}" class="btn btn-outline-secondary">Списък</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Видове кредит -->
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-header fw-bold d-flex justify-content-between align-items-center">
+                    <span>🏦 Видове кредит</span>
+                    <span class="toggle-icon" style="cursor: pointer;" onclick="toggleMenu('credit-menu')">▼</span>
+                </div>
+                <div class="card-body" id="credit-menu">
+                    <form method="post" class="mb-3">
+                        {% csrf_token %}
+                        <div class="mb-2">
+                            <label for="id_loan_type">Тип:</label>
+                            {{ credit_form.loan_type }}
+                        </div>
+                        <div class="form-check mb-3">
+                            {{ credit_form.is_active }} <label class="form-check-label" for="id_is_active">Активен</label>
+                        </div>
+                        <button type="submit" name="add_credit_type" class="btn btn-primary">Добави</button>
+                        <p>
+
+                        </p>
+                        <a href="{% url 'nomenclatures:loan_type_list' %}" class="btn btn-outline-secondary">Списък</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Градове -->
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-header fw-bold d-flex justify-content-between align-items-center">
+                    <span>🌆 Градове</span>
+                    <span class="toggle-icon" style="cursor: pointer;" onclick="toggleMenu('town-menu')">▼</span>
+                </div>
+                <div class="card-body" id="town-menu">
+                    <form method="post" class="mb-3">
+                        {% csrf_token %}
+                        <div class="mb-2">
+                            <label for="id_name">Име:</label>
+                            {{ town_form.name }}
+                        </div>
+                        <div class="form-check mb-3">
+                            {{ town_form.is_active }} <label class="form-check-label" for="id_is_active">Активен</label>
+                        </div>
+                        <button type="submit" name="add_town" class="btn btn-primary">Добави</button>
+                        <p>
+
+                        </p>
+                        <a href="{% url 'nomenclatures:town_list' %}" class="btn btn-outline-secondary">Списък</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    function toggleMenu(id) {
+        const menu = document.getElementById(id);
+        menu.classList.toggle('d-none');
+    }
+</script>
+{% endblock %}

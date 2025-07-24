@@ -16,9 +16,10 @@
         <input type="date" name="end_date" value="{{ end_date|date:'Y-m-d' }}" class="form-control">
       </div>
       <div class="col-md-4 d-flex align-items-end justify-content-end">
-        <button type="submit" class="btn btn-primary me-2">Филтрирай</button>
-        <button type="submit" name="export" value="1" class="btn btn-success me-2">📤 Excel</button>
-         <a href="{% url 'reports:productivity_report' %}" class="btn btn-secondary">Изчисти</a>
+        <button type="submit" class="btn btn-outline-secondary me-2">🔍 Търси</button>
+        <a href="{% url 'reports:productivity_report' %}" class="btn btn-outline-danger me-2">✖ Изчисти</a>
+          <button type="submit" name="export" value="1" class="btn btn-outline-success me-2">📤 Excel</button>
+
       </div>
     </form>
 

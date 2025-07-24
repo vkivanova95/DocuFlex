@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card shadow-sm p-4">
+    <h4 class="custom-header mb-4">Добавяне на потребител</h4>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Запази</button>
+    </form>
+    <p>
+
+    </p>
+    <div>
+        <a href="{% url 'users:user-list' %}" class="btn btn-outline-secondary ms-2">Назад към списък с потребители</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,38 +1,21 @@
 from django import forms
-
 from annexes.mixins import StartFieldsMixin
 from common.forms import BaseStyledSimpleForm, styled_datefield
 from django.forms import formset_factory
+from common.mixins import AnnexFormBehaviorMixin
 
 
 class BaseAnnexStartForm(forms.Form):
-    request_number = forms.CharField(
-        label="Номер на заявка",
-        widget=forms.TextInput(attrs={'class': 'form-control'})
-    )
-    annex_number = forms.CharField(
-        label="Анекс №",
-        widget=forms.TextInput(attrs={'class': 'form-control'})
-    )
-    annex_date = styled_datefield(label="Анекс дата")  # той вече съдържа class='form-control'
-    city = forms.CharField(
-        label="Град",
-        widget=forms.TextInput(attrs={'class': 'form-control'})
-    )
+    request_number = forms.CharField(label="Номер на заявка", widget=forms.TextInput(attrs={'class': 'form-control'}))
+    annex_number = forms.CharField(label="Анекс №", widget=forms.TextInput(attrs={'class': 'form-control'}))
+    annex_date = styled_datefield(label="Анекс дата")  # вече съдържа class='form-control'
+    city = forms.CharField(label="Град", widget=forms.TextInput(attrs={'class': 'form-control'}))
 
 
-class AnnexStandardForm(StartFieldsMixin, BaseStyledSimpleForm):
+class AnnexStandardForm(AnnexFormBehaviorMixin, StartFieldsMixin, BaseStyledSimpleForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
-        # Скриване на базовите полета
-        for field in ['request_number', 'annex_number', 'annex_date', 'city']:
-            self.fields[field].widget = forms.HiddenInput()
-
-        # Чекбокси за BooleanField
-        for name, field in self.fields.items():
-            if isinstance(field, forms.BooleanField):
-                field.widget = forms.CheckboxInput()
+        self.apply_annex_form_behavior()
 
     def clean(self):
         cleaned_data = super().clean()
@@ -70,34 +53,17 @@ class AnnexStandardForm(StartFieldsMixin, BaseStyledSimpleForm):
     other_V = forms.CharField(label="Друго V", required=False)
 
 
-class AnnexDeletionForm(StartFieldsMixin, BaseAnnexStartForm):
-    repaid_amount = forms.CharField(
-        label="Погасена сума",
-        required=True,
-        widget=forms.TextInput(attrs={'class': 'form-control'})
-    )
-    deed_number = forms.CharField(
-        label="Нотариален акт №",
-        required=True,
-        widget=forms.TextInput(attrs={'class': 'form-control'})
-    )
-    collateral_description = forms.CharField(
-        label="Описание на обезпечението",
-        required=True,
-        widget=forms.TextInput(attrs={'class': 'form-control'})
-    )
+class AnnexDeletionForm(AnnexFormBehaviorMixin, StartFieldsMixin, BaseAnnexStartForm):
+    repaid_amount = forms.CharField(label="Погасена сума", required=True, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    deed_number = forms.CharField(label="Нотариален акт №", required=True, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    collateral_description = forms.CharField(label="Описание на обезпечението", required=True,widget=forms.TextInput(attrs={'class': 'form-control'}))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        for field in ['request_number', 'annex_number', 'annex_date', 'city']:
-            self.fields[field].widget = forms.HiddenInput()
+        self.apply_annex_form_behavior()
+
 
 class AdditionalConditionForm(forms.Form):
-    text = forms.CharField(
-        label="",
-        required=False,
-        widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 2})
-    )
+    text = forms.CharField(label="", required=False, widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 2}))
+
 AdditionalConditionFormSet = formset_factory(AdditionalConditionForm, extra=1, can_order=False, can_delete=True)
-
-

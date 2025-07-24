@@ -1,3 +1,4 @@
+from common.mixins import GroupRequiredMixin
 from django import forms
 from django.contrib.auth.mixins import LoginRequiredMixin
 from common.forms import BaseStyledForm
@@ -12,68 +13,79 @@ from django.shortcuts import render, get_object_or_404, redirect
 from .models import Request
 from .utils import get_executors
 from django.contrib import messages
-from django.utils.decorators import method_decorator
-from django.contrib.auth.decorators import login_required
+from logs.mixins import LogActionMixin
 
 
-class RequestCreateForm(BaseStyledForm):
+class RequestCreateForm(LoginRequiredMixin, GroupRequiredMixin, BaseStyledForm):
+    allowed_groups = ['бизнес']
+
     class Meta:
         model = Request
         fields = ['client', 'loan_agreement', 'document_type']
-        widgets = {
-            'document_type': forms.Select(attrs={'class': 'form-control'}),
-        }
+        widgets = {'document_type': forms.Select(attrs={'class': 'form-control'}),}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['loan_agreement'].queryset = Contract.objects.filter(is_active=True)
 
-class RequestEIKSearchView(View):
+
+class RequestEIKSearchView(LoginRequiredMixin, GroupRequiredMixin, View):
+    allowed_groups = ['бизнес']
+
     def get(self, request):
-        form = EIKLookupForm()
-        return render(request, 'requests/eik_search.html', {'form': form})
+        return render(request, 'requests/eik_search.html', {'form': EIKLookupForm()})
 
     def post(self, request):
         form = EIKLookupForm(request.POST)
         if form.is_valid():
             eik = form.cleaned_data['eik']
-            try:
-                client = Client.objects.get(eik=eik)  # без is_active=True
-
-                if not client.is_active:
-                    return render(request, 'requests/eik_search.html', {
-                        'form': form,
-                        'inactive_client': True,
-                        'client_id': client.id,
-                        'eik': eik,
-                    })
-
-                # Клиентът е активен
-                contracts = Contract.objects.filter(client=client, is_active=True)
-                if not contracts.exists():
-                    return render(request, 'requests/eik_search.html', {
-                        'form': form,
-                        'error': 'Няма активни договори за този клиент.',
-                        'show_create_contract': True,
-                        'client_id': client.id,
-                    })
-
-                return render(request, 'requests/select_contract.html', {
-                    'client': client,
-                    'contracts': contracts
-                })
-
-            except Client.DoesNotExist:
-                return render(request, 'requests/eik_search.html', {
-                    'form': form,
-                    'client_not_found': True,
-                    'eik': eik
-                })
-
+            return self.handle_client_lookup(eik, form)
         return render(request, 'requests/eik_search.html', {'form': form})
 
+    def handle_client_lookup(self, eik, form):
+        client = Client.objects.filter(eik=eik).first()
 
-class RequestFinalizeView(View):
+        if not client:
+            return self.render_not_found(form, eik)
+
+        if not client.is_active:
+            return self.render_inactive(client, form, eik)
+
+        contracts = Contract.objects.filter(client=client, is_active=True)
+        if not contracts.exists():
+            return self.render_no_contracts(client, form)
+
+        return render(self.request, 'requests/select_contract.html', {
+            'client': client,
+            'contracts': contracts
+        })
+
+    def render_not_found(self, form, eik):
+        return render(self.request, 'requests/eik_search.html', {
+            'form': form,
+            'client_not_found': True,
+            'eik': eik
+        })
+
+    def render_inactive(self, client, form, eik):
+        return render(self.request, 'requests/eik_search.html', {
+            'form': form,
+            'inactive_client': True,
+            'client_id': client.id,
+            'eik': eik,
+        })
+
+    def render_no_contracts(self, client, form):
+        return render(self.request, 'requests/eik_search.html', {
+            'form': form,
+            'error': 'Няма активни договори за този клиент.',
+            'show_create_contract': True,
+            'client_id': client.id,
+        })
+
+
+class RequestFinalizeView(LoginRequiredMixin, GroupRequiredMixin, View):
+    allowed_groups = ['бизнес']
 
     def post(self, request):
         client_id = request.POST.get('client_id')
@@ -82,7 +94,7 @@ class RequestFinalizeView(View):
         client = get_object_or_404(Client, id=client_id, is_active=True)
         loan_agreement = get_object_or_404(Contract, id=loan_agreement_id, is_active=True)
 
-        # Попълване на формата с предварително зададени стойности
+        # Попълване на заявката с предварително зададени стойности
         initial_data = {
             'client': client,
             'loan_agreement': loan_agreement,
@@ -101,7 +113,9 @@ class RequestFinalizeView(View):
         return HttpResponseRedirect(reverse('requests:request_add'))  # защита от ръчно писане на GET
 
 
-class RequestSubmitView(View):
+class RequestSubmitView(LoginRequiredMixin, GroupRequiredMixin, View):
+    allowed_groups = ['бизнес']
+
     def post(self, request):
         form = RequestForm(request.POST)
         if form.is_valid():
@@ -114,10 +128,13 @@ class RequestSubmitView(View):
             # Успешно създаване – генерирай номер
             return redirect('requests:request_add')
 
-        # Ако невалидно – формата
+        # иначе – формата
         return render(request, 'requests/request_finalize.html', {'form': form})
 
-class AssignRequestsView(View):
+
+class AssignRequestsView(LoginRequiredMixin, GroupRequiredMixin, View):
+    allowed_groups = ['изпълнител']
+
     def get(self, request):
         pending_requests = Request.objects.filter(maker__isnull=True)
         executors = get_executors()
@@ -137,8 +154,9 @@ class AssignRequestsView(View):
         return redirect('requests:assign_requests')
 
 
-@method_decorator(login_required, name='dispatch')
-class AssignedRequestsListView(View):
+class AssignedRequestsListView(LoginRequiredMixin, GroupRequiredMixin, View):
+    allowed_groups = ['изпълнител']
+
     def get(self, request):
         current_user = request.user
         selected_executor_id = request.GET.get('executor')
@@ -150,7 +168,7 @@ class AssignedRequestsListView(View):
             if selected_executor_id != 'all':
                 requests_qs = requests_qs.filter(maker_id=selected_executor_id)
         else:
-            # Ако не е избрано нищо – по подразбиране се показват заявките на текущия потребител
+            # Ако не е избрано нищо – по дифолт се показват заявките на текущия потребител
             requests_qs = requests_qs.filter(maker=current_user)
 
         return render(request, 'requests/assigned_requests.html', {
@@ -159,46 +177,56 @@ class AssignedRequestsListView(View):
             'selected_executor': selected_executor_id or str(current_user.id),
         })
 
-class RequestDetailView(LoginRequiredMixin, UpdateView):
+class RequestDetailView(LoginRequiredMixin, GroupRequiredMixin, LogActionMixin, UpdateView):
     model = Request
     form_class = RequestExecutionForm
     template_name = 'requests/request_detail.html'
     success_url = reverse_lazy('requests:assigned_requests')
+    allowed_groups = ['изпълнител']
+    action_type = 'edit'
 
     def form_valid(self, form):
         messages.success(self.request, 'Заявката беше успешно актуализирана.')
         return super().form_valid(form)
 
 
-@method_decorator(login_required, name='dispatch')
-class RequestListView(ListView):
+class RequestListView(LoginRequiredMixin, GroupRequiredMixin, ListView):
     model = Request
     template_name = 'requests/request_list_all.html'
     context_object_name = 'requests'
     paginate_by = 10
+    allowed_groups = ['изпълнител', 'бизнес', 'ръководител']
 
     def get_queryset(self):
-        queryset = Request.objects.select_related('client', 'loan_agreement', 'maker').all()
+        return self.apply_filters(Request.objects.select_related('client', 'loan_agreement', 'maker'))
 
-        name = self.request.GET.get('name', '')
-        eik = self.request.GET.get('eik', '')
-        contract = self.request.GET.get('contract', '')
-        maker = self.request.GET.get('maker', '')
-        document_type = self.request.GET.get('document_type', '')
-        status = self.request.GET.get('status', '')
+    def apply_filters(self, queryset):
+        filters = {
+            'name': self.request.GET.get('name', ''),
+            'eik': self.request.GET.get('eik', ''),
+            'contract': self.request.GET.get('contract', ''),
+            'maker': self.request.GET.get('maker', ''),
+            'document_type': self.request.GET.get('document_type', ''),
+            'status': self.request.GET.get('status', ''),
+        }
 
-        if name:
-            queryset = queryset.filter(client__name__icontains=name)
-        if eik:
-            queryset = queryset.filter(client__eik__icontains=eik)
-        if contract:
-            queryset = queryset.filter(loan_agreement__contract_number__icontains=contract)
-        if maker:
-            queryset = queryset.filter(maker_id=maker)
-        if document_type:
-            queryset = queryset.filter(document_type=document_type)
-        if status:
-            queryset = queryset.filter(status=status)
+        if filters['name']:
+            queryset = queryset.filter(client__name__icontains=filters['name'])
+
+        if filters['eik']:
+            queryset = queryset.filter(client__eik__icontains=filters['eik'])
+
+        if filters['contract']:
+            queryset = queryset.filter(loan_agreement__contract_number__icontains=filters['contract'])
+
+        if filters['maker']:
+            queryset = queryset.filter(maker_id=filters['maker'])
+
+        if filters['document_type']:
+            queryset = queryset.filter(document_type=filters['document_type'])
+
+        if filters['status']:
+            queryset = queryset.filter(status=filters['status'])
 
         return queryset
 
@@ -210,7 +238,6 @@ class RequestListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
         context['makers'] = get_executors()
         context['filters'] = {
             'name': self.request.GET.get('name', ''),
@@ -223,8 +250,9 @@ class RequestListView(ListView):
         context['per_page'] = self.get_paginate_by(self.get_queryset())
         return context
 
-@method_decorator(login_required, name='dispatch')
-class RequestDetailReadOnlyView(DetailView):
+
+class RequestDetailReadOnlyView(LoginRequiredMixin, GroupRequiredMixin, DetailView):
     model = Request
     template_name = 'requests/request_detail_readonly.html'
     context_object_name = 'request_obj'
+    allowed_groups = ['изпълнител', 'бизнес', 'ръководител']

@@ -1,16 +1,20 @@
-from django.conf import settings
+from common.mixins import GroupRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views import View
 from django.shortcuts import render, get_object_or_404, redirect
-
 from loan_requests.utils import get_executors
 from .forms import AnnexStandardForm, AdditionalConditionFormSet, AnnexDeletionForm, BaseAnnexStartForm
 from .models import Request, GeneratedAnnex
 from .utils import generate_annex_standard, generate_annex_deletion
 from django.contrib import messages
 from django.views.generic import ListView
+from logs.models import SystemLog
+from django.utils.timezone import now
 
 
-class GenerateAnnexView(View):
+class GenerateAnnexView(LoginRequiredMixin, GroupRequiredMixin, View):
+    allowed_groups = ['изпълнител']
+
     def get(self, request):
         # Стартовата форма с 4-те основни полета
         start_form = BaseAnnexStartForm()
@@ -19,7 +23,7 @@ class GenerateAnnexView(View):
         })
 
     def post(self, request):
-        # 1. Ако няма 'step' -> обработваме началната форма (с 4 полета)
+        # 1. обработваме началната форма (с 4 полета)
         if 'step' not in request.POST:
             start_form = BaseAnnexStartForm(request.POST)
             if start_form.is_valid():
@@ -43,11 +47,23 @@ class GenerateAnnexView(View):
                 'start_form': start_form
             })
 
-        # 2. Втората стъпка – пълна форма
+        # 2. пълна форма
         annex_type = request.POST.get('annex_type', 'standard')
         form_class = self.get_form_class(annex_type)
-        form = form_class(request.POST)
-        formset = AdditionalConditionFormSet(request.POST) if annex_type == 'standard' else None
+        form = form_class(
+            request.POST,
+            initial={
+                'request_number': request.POST.get('request_number'),
+                'annex_number': request.POST.get('annex_number'),
+                'annex_date': request.POST.get('annex_date'),
+                'city': request.POST.get('city'),
+            }
+        )
+        formset = (
+            AdditionalConditionFormSet(request.POST)
+            if annex_type == 'standard'
+            else None
+        )
 
         if form.is_valid() and (formset is None or formset.is_valid()):
             req = get_object_or_404(Request, request_number=form.cleaned_data['request_number'])
@@ -58,7 +74,6 @@ class GenerateAnnexView(View):
                 extra = [f.cleaned_data['text'] for f in formset if f.cleaned_data]
                 file_path = generate_annex_standard(form.cleaned_data, req, extra_conditions=extra)
 
-            # Увери се, че file_path няма media/
             if file_path.startswith("media/"):
                 file_path = file_path.replace("media/", "")
 
@@ -76,6 +91,15 @@ class GenerateAnnexView(View):
                              f'Анекс №{form.cleaned_data["annex_number"]} към Договор № {req.loan_agreement.contract_number} е успешно генериран. '
                              f'<a href="{download_url}" target="_blank">Изтегли анекса</a>')
 
+            SystemLog.objects.create(
+                user=request.user,
+                action='generate_annex',
+                model_name='GeneratedAnnex',
+                object_id=annex_obj.pk,
+                timestamp=now(),
+                description=f"Генериран анекс №{annex_obj.annex_number} към договор {req.loan_agreement.contract_number}."
+            )
+
             return redirect('home')
 
         # при грешка – връщаме обратно формата
@@ -91,11 +115,12 @@ class GenerateAnnexView(View):
         return AnnexDeletionForm if annex_type == 'deletion' else AnnexStandardForm
 
 
-class AnnexArchiveView(ListView):
+class AnnexArchiveView(LoginRequiredMixin, GroupRequiredMixin, ListView):
     model = GeneratedAnnex
     template_name = 'annexes/annex_archive.html'
     context_object_name = 'annexes'
-    paginate_by = 20
+    paginate_by = 10
+    allowed_groups = ['бизнес', 'ръководител', 'изпълнител']
 
     def get_queryset(self):
         queryset = GeneratedAnnex.objects.select_related(
@@ -108,20 +133,26 @@ class AnnexArchiveView(ListView):
 
         if request_number:
             queryset = queryset.filter(request__request_number__icontains=request_number)
-
         if eik:
             queryset = queryset.filter(request__client__eik__icontains=eik)
-
         if contract_number:
             queryset = queryset.filter(request__loan_agreement__contract_number__icontains=contract_number)
 
-
         return queryset
+
+    def get_paginate_by(self, queryset):
+        per_page = self.request.GET.get('per_page')
+
+        if per_page == 'all':
+            return queryset.count()  # disables pagination
+        try:
+            return int(per_page)
+        except (TypeError, ValueError):
+            return self.paginate_by
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['makers'] = get_executors()
-        # Подаваме стойностите от филтъра
         context['filters'] = {
             'request_number': self.request.GET.get('request_number', ''),
             'client_name': self.request.GET.get('client_name', ''),
@@ -130,5 +161,5 @@ class AnnexArchiveView(ListView):
             'maker': self.request.GET.get('maker', ''),
         }
 
-        context['per_page'] = self.get_paginate_by(self.get_queryset())
+        context['per_page'] = self.request.GET.get('per_page', str(self.paginate_by))
         return context

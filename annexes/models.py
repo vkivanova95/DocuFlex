@@ -10,4 +10,3 @@ class GeneratedAnnex(models.Model):
     annex_date = models.DateField()
     file_path = models.FileField(upload_to='annexes/')
     created_at = models.DateTimeField(auto_now_add=True)
-

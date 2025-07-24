@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="card shadow-sm p-4">
+<div class="text-center mt-5">
+    <h2 class="mb-4" style="color: #003366;">Добре дошли в системата DocuFlex</h2>
+</div>
+    <p>
+        DocuFlex е вътрешна платформа за управление на клиентски досиета, договори и анекси в корпоративното кредитиране. Системата позволява ефективно и сигурно обработване на заявките, проследимост на действията и централизирано управление на документи.
+    </p>
+
+    <h4 class="mt-4">Как работи системата?</h4>
+    <p>
+        Регистрирането на клиенти се извършва от оторизирани потребители, които въвеждат основната информация и идентификационните данни на клиента в системата.
+    </p>
+    <p>
+        След регистрацията се пристъпва към създаване и подписване на договори, като всеки договор съдържа всички необходими параметри и се асоциира с конкретен клиент.
+    </p>
+    <p>
+        При необходимост от промени или допълнения по договорите, отговорните лица могат да подават заявки за изготвяне на анекси, които следват дефиниран работен поток.
+    </p>
+    <p>
+        Подадените заявки се разпределят към изпълнители, които ги обработват и подготвят нужните документи. След това заявките преминават през одобрение от ръководен потребител.
+    </p>
+    <p>
+        Целият процес завършва с автоматичното генериране на анекси и други документи на базата на въведените данни, с гарантирана проследимост и консистентност.
+    </p>
+
+    <h4 class="mt-4">Последни новини</h4>
+
+    {% if news_posts %}
+        <ul id="news-list">
+            {% for post in news_posts %}
+                <li class="mb-4 {% if forloop.counter > 3 %}d-none extra-news{% endif %}">
+                    <strong>{{ post.title }}</strong><br>
+                    <small class="text-muted">{{ post.published_at|date:"d.m.Y H:i" }}</small><br>
+                    {{ post.content|linebreaks }}
+                </li>
+            {% endfor %}
+        </ul>
+
+        {% if news_posts|length > 3 %}
+            <div class="text-center">
+                <button id="show-more" class="btn btn-outline-secondary">Покажи всички новини</button>
+            </div>
+        {% endif %}
+    {% else %}
+        <p>Все още няма публикувани новини.</p>
+    {% endif %}
+
+    {% if not user.is_authenticated %}
+        <div class="text-center mt-4">
+            <a href="{% url 'users:login' %}" class="btn btn-primary">Вход в системата</a>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const showMoreBtn = document.getElementById('show-more');
+        if (showMoreBtn) {
+            showMoreBtn.addEventListener('click', function () {
+                document.querySelectorAll('.extra-news').forEach(el => el.classList.remove('d-none'));
+                showMoreBtn.style.display = 'none';
+            });
+        }
+    });
+</script>
+
+{% endblock %}

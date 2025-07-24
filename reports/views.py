@@ -1,20 +1,19 @@
-from django.shortcuts import render
+from common.mixins import GroupRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views import View
 from django.shortcuts import render
 from django.contrib.auth import get_user_model
-from django.db.models import Count, Q
 from django.http import HttpResponse
 from openpyxl import Workbook
 from io import BytesIO
-
 from loan_requests.models import Request
 from annexes.models import GeneratedAnnex
-
 from dateutil import parser
 
 
-class ProductivityReportView(View):
+class ProductivityReportView(LoginRequiredMixin, GroupRequiredMixin, View):
     template_name = 'reports/productivity_report.html'
+    allowed_groups = ['ръководител']
 
     def get(self, request):
         start_date = request.GET.get('start_date')
@@ -34,22 +33,16 @@ class ProductivityReportView(View):
         # Филтриране на заявките и анексите по период
         requests_qs = Request.objects.all()
         annexes_qs = GeneratedAnnex.objects.all()
-        # print("Зададен период:", start, "до", end)
-        # print("Общо заявки в периода:", requests_qs.count())
-        # print("Общо анекси в периода:", annexes_qs.count())
 
         if start and end:
             requests_qs = requests_qs.filter(created_at__date__range=(start, end))
             annexes_qs = annexes_qs.filter(created_at__date__range=(start, end))
-
-
 
         for user in executors:
             # user_requests = requests_qs.filter(maker=user)
             # user_annexes = annexes_qs.filter(request__maker=user)
             user_requests = requests_qs.filter(maker__id=user.id)
             user_annexes = annexes_qs.filter(request__maker__id=user.id)
-
 
             report_data.append({
                 'user': user.get_full_name() or user.username,
@@ -89,7 +82,7 @@ class ProductivityReportView(View):
         wb.save(output)
         output.seek(0)
 
-        # Връщане като отговор
+        # Връщане в ексел
         filename = f"productivity_report_{start_date}_to_{end_date}.xlsx"
         response = HttpResponse(
             output.read(),

@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card p-4 shadow-sm">
+    <h4>Резултат от изпращането</h4>
+    {% if status == 'success' %}
+        <div class="alert alert-success">{{ message }}</div>
+    {% else %}
+        <div class="alert alert-danger">{{ message }}</div>
+    {% endif %}
+    <a href="{% url 'annexes:annex_archive' %}" class="btn btn-secondary mt-2">Назад към Архив</a>
+</div>
+{% endblock %}

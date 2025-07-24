@@ -62,6 +62,7 @@
         <tr>
             <th>№</th>
             <th>Клиент</th>
+            <th>ЕИК</th>
             <th>Договор</th>
             <th>Документ</th>
             <th>Изпълнител</th>
@@ -73,6 +74,7 @@
         <tr onclick="location.href='{% url 'requests:request_view' req.id %}'" style="cursor:pointer;">
             <td>{{ req.request_number }}</td>
             <td>{{ req.client.name }}</td>
+            <td>{{ req.client.eik }}</td>
             <td>{{ req.loan_agreement.contract_number }}</td>
             <td>{{ req.get_document_type_display }}</td>
             <td>{{ req.maker.get_full_name|default:"-" }}</td>
@@ -85,6 +87,8 @@
         {% endfor %}
     </tbody>
 </table>
+<p>
 
+</p>
 {% include "pagination.html" with page_obj=page_obj %}
 {% endblock %}

@@ -1,3 +1,5 @@
+from common.mixins import GroupRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.db.models import Q
 from django.shortcuts import render
@@ -8,15 +10,17 @@ from .models import Client
 from .forms import ClientForm, EIKLookupForm
 from django.contrib import messages
 from django.shortcuts import redirect
-from django.views.decorators.csrf import csrf_exempt
-from django.utils.decorators import method_decorator
+from logs.mixins import LogActionMixin
 
-class ClientCreateView(SuccessMessageMixin, CreateView):
+
+class ClientCreateView(LoginRequiredMixin, GroupRequiredMixin, SuccessMessageMixin, LogActionMixin, CreateView):
     model = Client
     form_class = ClientForm
     template_name = 'clients/client_form.html'
     success_url = reverse_lazy('home')
     success_message = "Клиентът беше успешно създаден."
+    allowed_groups = ['бизнес']
+    action_type = 'create'
 
     def form_valid(self, form):
         form.instance.is_active = True
@@ -29,12 +33,15 @@ class ClientCreateView(SuccessMessageMixin, CreateView):
             initial['eik'] = eik
         return initial
 
-class ClientUpdateView(SuccessMessageMixin, UpdateView):
+
+class ClientUpdateView(LoginRequiredMixin, GroupRequiredMixin, SuccessMessageMixin, LogActionMixin, UpdateView):
     model = Client
     form_class = ClientForm
     template_name = 'clients/client_form.html'
     success_url = reverse_lazy('home')
     success_message = "Данните бяха успешно редактирани."
+    allowed_groups = ['бизнес']
+    action_type = 'edit'
 
     def form_valid(self, form):
         return super().form_valid(form)
@@ -46,8 +53,9 @@ class ClientUpdateView(SuccessMessageMixin, UpdateView):
         return reverse('home')
 
 
-class ClientEIKLookupView(View):
+class ClientEIKLookupView(LoginRequiredMixin, GroupRequiredMixin, View):
     template_name = 'clients/client_eik_lookup.html'
+    allowed_groups = ['бизнес']
 
     def get(self, request):
         form = EIKLookupForm()
@@ -65,11 +73,12 @@ class ClientEIKLookupView(View):
         return render(request, self.template_name, {'form': form})
 
 
-class ClientListView(ListView):
+class ClientListView(LoginRequiredMixin, GroupRequiredMixin, ListView):
     model = Client
     template_name = 'clients/client_list.html'
     context_object_name = 'clients'
     paginate_by = 10
+    allowed_groups = ['бизнес', 'ръководител', 'изпълнител']
 
     def get_paginate_by(self, queryset):
         per_page = self.request.GET.get('per_page')
@@ -86,7 +95,6 @@ class ClientListView(ListView):
                 Q(name__icontains=search_query) | Q(eik__icontains=search_query)
             )
 
-        # Филтриране по статус
         status_filter = self.request.GET.get('status')
         if status_filter == 'active':
             queryset = queryset.filter(is_active=True)
@@ -101,8 +109,9 @@ class ClientListView(ListView):
         return context
 
 
-class ClientDeactivateView(View):
-    @method_decorator(csrf_exempt)
+class ClientDeactivateView(LoginRequiredMixin, GroupRequiredMixin, View):
+    allowed_groups = ['бизнес']
+
     def post(self, request, pk):
         try:
             client = Client.objects.get(pk=pk)
@@ -118,5 +127,3 @@ class ClientDeactivateView(View):
             messages.error(request, "Клиентът не беше намерен.")
 
         return redirect("clients:list")
-
-

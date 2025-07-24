@@ -2,7 +2,6 @@ from django import forms
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
-
 from .models import Request
 from contracts.models import Contract
 from common.forms import BaseStyledForm
@@ -29,13 +28,8 @@ class RequestExecutionForm(BaseStyledForm):
         ('false', 'Не'),
     )
 
-    correction_required = forms.ChoiceField(
-        choices=YES_NO_CHOICES,
-        widget=forms.Select(attrs={'class': 'form-control'}),
-        label='Корекции по документа',
-        required=False
-    )
-
+    correction_required = forms.ChoiceField(choices=YES_NO_CHOICES, widget=forms.Select(attrs={'class': 'form-control'}),
+                                            label='Корекции по документа', required=False)
     preparation_date = styled_datefield(label='Дата на изготвяне', required=False)
     signing_date = styled_datefield(label='Дата на подписване', required=False)
 
@@ -52,10 +46,10 @@ class RequestExecutionForm(BaseStyledForm):
     def post(self, request, pk):
         req = get_object_or_404(Request, pk=pk)
         form = RequestExecutionForm(request.POST, instance=req)
+
         if form.is_valid():
             form.save()
             messages.success(request, "Заявката е обновена успешно.")
-
             return_to = request.GET.get('return_to', reverse_lazy('requests:assigned_requests'))
             return redirect(return_to)
 

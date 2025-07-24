@@ -4,7 +4,6 @@ def validate_eik_only_digits(value):
     if not value.isdigit():
         raise ValidationError("ЕИК трябва да съдържа само цифри.")
 
-
 def validate_represented_together(data):
     represented_together = data.get('represented_together')
     representative1 = data.get('representative1')

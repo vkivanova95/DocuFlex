@@ -2,6 +2,7 @@
 {% load static %}
 
 {% block content %}
+
 <div class="card shadow-sm p-4">
     <h4 class="custom-header"> Преглед на договори</h4>
 
@@ -62,7 +63,10 @@
     {% endfor %}
   </tbody>
 </table>
+<p>
 
+</p>
 {% include "pagination.html" with page_obj=page_obj %}
 </div>
+
 {% endblock %}

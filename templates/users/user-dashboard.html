@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card shadow-sm p-4">
+    <h4 class="custom-header mb-3">Управление на потребители</h4>
+    <ul class="list-group mb-3">
+        <li class="list-group-item">
+            <a href="{% url 'users:user-create' %}">Добави нов потребител</a>
+        </li>
+        <li class="list-group-item">
+            <a href="{% url 'users:user-list' %}">Списък с потребители</a>
+        </li>
+    </ul>
+    <a href="{% url 'home' %}" class="btn btn-secondary">Назад към начална страница</a>
+</div>
+{% endblock %}

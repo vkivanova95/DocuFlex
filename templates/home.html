@@ -1,10 +1,10 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load group_tags %}
 
 {% block content %}
 <div class="text-center mt-5">
     <h2 class="mb-4" style="color: #003366;">Добре дошли в Платформата за генериране и управление на документи</h2>
-    <p class="lead">Тук можете да въвеждате и управлявате клиентски данни, договори и документи.</p>
 </div>
 
 <div class="container mt-5">
@@ -14,14 +14,20 @@
         <div class="col-md-4">
             <div class="card shadow-sm">
                 <div class="card-header fw-bold d-flex justify-content-between align-items-center">
-                    <span>👥 Клиенти</span>
+                    <span>🧑‍💻 Клиенти</span>
                     <span class="toggle-icon" style="cursor: pointer;" onclick="toggleMenu('clients-menu')">▼</span>
                 </div>
                 <div class="card-body d-none" id="clients-menu">
                     <ul class="list-unstyled">
-                        <li><a href="{% url 'clients:create' %}">➕ Добавяне клиент</a></li>
-                        <li><a href="{% url 'clients:eik_lookup' %}">✏️ Редакция клиент</a></li>
-                        <li><a href="{% url 'clients:list' %}">🔍 Преглед клиенти</a></li>
+                        {% if request.user|has_group:"бизнес" or request.user.is_superuser%}
+                            <li><a href="{% url 'clients:create' %}">➕ Добавяне клиент</a></li>
+                        {% endif %}
+                        {% if request.user|has_group:"бизнес" or request.user.is_superuser%}
+                            <li><a href="{% url 'clients:eik_lookup' %}">✏️ Редакция клиент</a></li>
+                        {% endif %}
+                        {% if request.user|has_any_group:"бизнес, изпълнител, ръководител" or request.user.is_superuser%}
+                            <li><a href="{% url 'clients:list' %}">🔍 Преглед клиенти</a></li>
+                        {% endif %}
                     </ul>
                 </div>
             </div>
@@ -36,9 +42,15 @@
                 </div>
                 <div class="card-body d-none" id="contracts-menu">
                     <ul class="list-unstyled">
-                        <li><a href="{% url 'contracts:create' %}">➕ Добавяне договор</a></li>
-                        <li><a href="{% url 'contracts:contract_eik_lookup' %}">✏️ Редакция договор</a></li>
-                        <li><a href="{% url 'contracts:list' %}">🔍 Преглед договори</a></li>
+                        {% if request.user|has_group:"бизнес" or request.user.is_superuser%}
+                            <li><a href="{% url 'contracts:create' %}">➕ Добавяне договор</a></li>
+                        {% endif %}
+                        {% if request.user|has_group:"бизнес" or request.user.is_superuser%}
+                            <li><a href="{% url 'contracts:contract_eik_lookup' %}">✏️ Редакция договор</a></li>
+                        {% endif %}
+                        {% if request.user|has_any_group:"бизнес, изпълнител, ръководител" or request.user.is_superuser%}
+                            <li><a href="{% url 'contracts:list' %}">🔍 Преглед договори</a></li>
+                        {% endif %}
                     </ul>
                 </div>
             </div>
@@ -53,17 +65,24 @@
                 </div>
                 <div class="card-body d-none" id="requests-menu">
                     <ul class="list-unstyled">
-                        <li><a href="{% url 'requests:request_add' %}">➕ Нова заявка</a></li>
-                        <li><a href="{% url 'requests:assign_requests' %}">✏️ Разпределяне на заявки</a></li>
-                        <li><a href="{% url 'requests:assigned_requests' %}">📋 Обработка на заявки</a></li>
-                        <li><a href="{% url 'requests:request_list_all' %}">🔍 Преглед заявки</a></li>
+                        {% if request.user|has_group:"бизнес" or request.user.is_superuser%}
+                            <li><a href="{% url 'requests:request_add' %}">➕ Нова заявка</a></li>
+                        {% endif %}
+                        {% if request.user|has_group:"изпълнител" or request.user.is_superuser%}
+                            <li><a href="{% url 'requests:assign_requests' %}">✏️ Разпределяне на заявки</a></li>
+                        {% endif %}
+                        {% if request.user|has_group:"изпълнител" or request.user.is_superuser%}
+                            <li><a href="{% url 'requests:assigned_requests' %}">📋 Обработка на заявки</a></li>
+                        {% endif %}
+                        {% if request.user|has_any_group:"бизнес, изпълнител, ръководител" or request.user.is_superuser%}
+                            <li><a href="{% url 'requests:request_list_all' %}">🔍 Преглед заявки</a></li>
+                        {% endif %}
                     </ul>
                 </div>
             </div>
         </div>
 
         <!-- Втори ред -->
-
         <!-- Документи -->
         <div class="col-md-4">
             <div class="card shadow-sm">
@@ -73,8 +92,12 @@
                 </div>
                 <div class="card-body d-none" id="docs-menu">
                     <ul class="list-unstyled">
-                        <li><a href="{% url 'annexes:generate_annex' %}">📄 Генерирай анекс</a></li>
-                        <li><a href="{% url 'annexes:annex_archive' %}">📚 Архив</a></li>
+                        {% if request.user|has_group:"изпълнител" or request.user.is_superuser %}
+                            <li><a href="{% url 'annexes:generate_annex' %}">📄 Генерирай анекс</a></li>
+                        {% endif %}
+                        {% if request.user|has_any_group:"бизнес, изпълнител, ръководител" or request.user.is_superuser%}
+                            <li><a href="{% url 'annexes:annex_archive' %}">📚 Регистър документи</a></li>
+                        {% endif %}
                     </ul>
                 </div>
             </div>
@@ -89,7 +112,9 @@
                 </div>
                 <div class="card-body d-none" id="reports-menu">
                     <ul class="list-unstyled">
-                        <li><a href="{% url 'reports:productivity_report' %}">📈 Преглед справки</a></li>
+                        {% if request.user|has_group:"ръководител" or request.user.is_superuser%}
+                            <li><a href="{% url 'reports:productivity_report' %}">📈 Преглед справки</a></li>
+                        {% endif %}
                     </ul>
                 </div>
             </div>
@@ -104,8 +129,21 @@
                 </div>
                 <div class="card-body d-none" id="admin-menu">
                     <ul class="list-unstyled">
-                        <li><a href="/admin/">🔐 Вход в администрация</a></li>
-                        <li><a href="#">👤 Управление потребители</a></li>
+                        {% if request.user.is_superuser %}
+                            <li><a href="/admin/">🔐 Вход в администрация</a></li>
+                        {% endif %}
+                        {% if request.user|has_group:"ръководител" or request.user.is_superuser%}
+                            <li><a href="{% url 'users:user-dashboard' %}">👤 Управление потребители</a></li>
+                        {% endif %}
+                        {% if request.user|has_group:"ръководител" or request.user.is_superuser%}
+                            <li><a href="{% url 'nomenclatures:nomenclature_list' %}">📚 Номенклатури</a></li>
+                        {% endif %}
+                        {% if request.user|has_group:"ръководител" or request.user.is_superuser%}
+                            <li><a href="{% url 'logs:log-list' %}">📈 Лог файл </a></li>
+                        {% endif %}
+                        {% if request.user|has_group:"ръководител" or request.user.is_superuser%}
+                            <li><a href="{% url 'news:news_list' %}">📰 Новини </a></li>
+                        {% endif %}
                     </ul>
                 </div>
             </div>

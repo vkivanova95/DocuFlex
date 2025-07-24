@@ -38,6 +38,12 @@ PROJECT_APPS = [
     'loan_requests',
     'annexes',
     'reports',
+    'nomenclatures',
+    'users',
+    'news',
+    'logs.apps.LogsConfig',
+    'rest_framework',
+    'api',
 ]
 
 INSTALLED_APPS = [
@@ -73,7 +79,6 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
-                'common.context_processors.current_datetime',
             ],
         },
     },
@@ -145,4 +150,10 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+AUTH_USER_MODEL = 'users.CustomUser'
+
+LOGIN_URL = '/users/login/'
+LOGIN_REDIRECT_URL = '/home/'
+LOGOUT_REDIRECT_URL = '/users/login/'
 

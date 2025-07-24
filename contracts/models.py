@@ -1,6 +1,7 @@
 from django.db import models
 from clients.models import Client
 
+
 class LoanType(models.Model):
     loan_type = models.CharField(max_length=50, unique=True, verbose_name="вид на кредита")
     is_active = models.BooleanField(default=True)
@@ -17,12 +18,9 @@ class Currency(models.Model):
     def __str__(self):
         return self.currency_code
 
+
 class Contract(models.Model):
-    contract_number = models.CharField(
-        max_length=20,
-        unique=True,
-        verbose_name="Договор номер",
-        help_text="Номер на Договора за кредит.")
+    contract_number = models.CharField(max_length=20, unique=True, verbose_name="Договор номер", help_text="Номер на Договора за кредит.")
     start_date = models.DateField(verbose_name="дата")
     client = models.ForeignKey(Client, on_delete=models.CASCADE, verbose_name="Клиент (ЕИК)")
     loan_type = models.ForeignKey(LoanType, on_delete=models.SET_NULL, blank=True, null = True, verbose_name = "вид на кредита")

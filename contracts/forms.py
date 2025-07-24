@@ -1,6 +1,5 @@
 from django import forms
 from django.core.exceptions import ValidationError
-
 from .models import Contract, Currency, LoanType
 from clients.models import Client
 from .validators import validate_active_client
@@ -14,7 +13,7 @@ class ContractForm(BaseStyledForm):
 
     class Meta:
         model = Contract
-        exclude = ['client']  # Скриваме оригиналното ForeignKey поле
+        exclude = ['client']  # Скриваме оригиналното FK поле
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

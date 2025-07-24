@@ -35,9 +35,6 @@
           </div>
         </div>
 
-
-
-
       <!-- Полета за допълване -->
       {% if form.non_field_errors %}
         <div class="alert alert-danger">
@@ -46,7 +43,7 @@
       {% endif %}
 
         {% if annex_type == 'standard' %}
-            <!-- Тук подреждаш полетата от AnnexStandardForm -->
+            <!-- Полетата от AnnexStandardForm -->
           <div class="row">
           <h5 class="mt-4">I. Промени в размера и валутата на кредита:</h5>
             <div class="col-md-4 mb-3">
@@ -159,8 +156,6 @@
         {% endif %}
 
 
-
-
         {% if annex_type == 'standard' %}
           <h5 class="mt-4">V. Други условия:</h5>
           <div id="formset-area">
@@ -187,6 +182,7 @@
     </form>
   </div>
 </div>
+
 
 <script>
   const formsetArea = document.getElementById('formset-area');

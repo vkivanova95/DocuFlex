@@ -14,6 +14,7 @@
                 <label for="clientName" class="form-label"><strong>Клиент:</strong></label>
                 <input type="text" class="form-control" id="clientName" value="{{ client.name }}" readonly>
             </div>
+         </div>
 
     <form method="post" action="{% url 'requests:request_finalize' %}" class="needs-validation" novalidate>
         {% csrf_token %}

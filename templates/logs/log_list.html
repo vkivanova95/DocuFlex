@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="card shadow-sm p-4">
+    <h4 class="custom-header mb-4">Системен регистър</h4>
+
+ <form method="get" class="mb-3 d-flex justify-content-end align-items-center gap-2">
+        <label for="per_page" class="form-label mb-0">Покажи по:</label>
+        <select name="per_page" id="per_page" class="form-select w-auto" onchange="this.form.submit()">
+            <option value="5" {% if request.GET.per_page == '5' %}selected{% endif %}>5</option>
+            <option value="10" {% if request.GET.per_page == '10' or not request.GET.per_page %}selected{% endif %}>10</option>
+            <option value="20" {% if request.GET.per_page == '20' %}selected{% endif %}>20</option>
+            <option value="all" {% if request.GET.per_page == 'all' %}selected{% endif %}>Всички</option>
+        </select>
+</form>
+
+    <form method="get" class="input-group mb-4">
+        <input type="text" name="q" class="form-control" placeholder="Търси по потребител, действие, модул и/или описание... " value="{{ query }}">
+
+        {% if query %}
+            <a href="{% url 'logs:log-list' %}" class="btn btn-outline-danger">✖ Изчисти</a>
+        {% else %}
+            <button type="submit" class="btn btn-outline-secondary mb-2">🔍 Търси</button>
+        {% endif %}
+    </form>
+
+<table class="table table-striped">
+<thead>
+  <tr>
+    <th>Дата/Час</th><th>Потребител</th><th>Действие</th><th>Модул</th><th>No</th><th>Описание</th>
+  </tr>
+</thead>
+
+<tbody>
+  {% for log in logs %}
+  <tr>
+    <td>{{ log.timestamp }}</td>
+    <td>{{ log.user }}</td>
+    <td>{{ log.get_action_display }}</td>
+    <td>{{ log.model_name }}</td>
+    <td>{{ log.object_id }}</td>
+    <td>{{ log.description }}</td>
+  </tr>
+  {% endfor %}
+</tbody>
+</table>
+</div>
+<p>
+
+</p>
+{% include "pagination.html" with page_obj=page_obj %}
+
+{% endblock %}

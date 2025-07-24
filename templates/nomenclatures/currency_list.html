@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h4 class="custom-header mb-4">Номенклатура валути</h4>
+
+    <div class="text-start">
+        <a href="{% url 'nomenclatures:nomenclature_list' %}" class="btn btn-outline-secondary mb-2">Назад</a>
+    </div>
+<p>
+
+</p>
+     <form method="get" class="input-group mb-4">
+        <input type="text" name="q" class="form-control" placeholder="Търси..." value="{{ query }}">
+
+        {% if query %}
+            <a href="{% url 'nomenclatures:currency_list' %}" class="btn btn-outline-danger">✖ Изчисти</a>
+        {% else %}
+            <button type="submit" class="btn btn-outline-secondary">🔍 Търси</button>
+        {% endif %}
+    </form>
+
+    <ul class="list-group">
+        {% for c in currencies %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    {{ c.currency_name }} ({{ c.currency_code }}) —
+                    <strong>{{ c.is_active|yesno:"Активна,Неактивна" }}</strong>
+                </div>
+                <form method="post" action="{% url 'nomenclatures:toggle-nomenclature-status' 'currency' c.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-secondary ms-2" title="Смени статус"><-> ️</button>
+                </form>
+            </li>
+        {% empty %}
+            <li class="list-group-item">Няма въведени валути.</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

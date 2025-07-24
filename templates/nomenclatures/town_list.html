@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h4 class="custom-header mb-4">Номенклатура градове</h4>
+
+    <div class="text-start mb-3">
+        <a href="{% url 'nomenclatures:nomenclature_list' %}" class="btn btn-outline-secondary mb-2">Назад</a>
+    </div>
+<p>
+
+</p>
+    <!-- Търсене -->
+    <form method="get" class="input-group mb-4">
+        <input type="text" name="q" class="form-control" placeholder="Търси по тип..." value="{{ query }}">
+        {% if query %}
+            <a href="{% url 'nomenclatures:town_list' %}" class="btn btn-outline-danger">✖ Изчисти</a>
+        {% else %}
+            <button type="submit" class="btn btn-outline-secondary">🔍 Търси</button>
+        {% endif %}
+    </form>
+
+    <ul class="list-group">
+        {% for t in towns %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    {{ t.name }} — <strong>{{ t.is_active|yesno:"Активен,Неактивен" }}</strong>
+                </div>
+                <form method="post" action="{% url 'nomenclatures:toggle-nomenclature-status' 'town' t.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-secondary" title="Смени статус"><-></button>
+                </form>
+            </li>
+        {% empty %}
+            <li class="list-group-item">Няма въведени градове.</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}
+

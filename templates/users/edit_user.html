@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card shadow-sm p-4">
+    <h4 class="custom-header mb-4">Редакция на нформацията за потребител: {{ user_obj.username }}</h4>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" name="save_user" class="btn btn-primary">Запази</button>
+    </form>
+
+    <hr class="my-4">
+    <h5>Смяна на служебна парола</h5>
+    <p>
+
+    </p>
+    <form method="post">
+        {% csrf_token %}
+        {{ password_form.as_p }}
+        <button type="submit" name="reset_password" class="btn btn-secondary ms-2">Смени парола</button>
+        <hr class="my-4">
+        <div>
+            <a href="{% url 'users:user-list' %}" class="btn btn-outline-secondary ms-2">Назад към списък с потребители</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,6 +1,7 @@
 from django import forms
 from django.forms import BooleanField
 
+
 class BaseStyledForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

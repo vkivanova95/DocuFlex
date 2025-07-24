@@ -121,3 +121,30 @@ input:focus:invalid, select:focus:invalid, textarea:focus:invalid {
     box-shadow: 0 0 5px rgba(220, 53, 69, 0.7);
 }
 
+.logout-link {
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    color: #007bff;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.logout-link:hover {
+    color: #0056b3;
+}
+
+
+.page-link {
+    color: #003366;
+    background-color: #fff;
+    border: 1px solid #ced4da;
+}
+
+
+.page-item.active .page-link {
+    color: #003366;
+    background-color: #e9ecef;
+    border-color: #ced4da;
+}
