@@ -68,7 +68,7 @@
                         {% if request.user|has_group:"бизнес" or request.user.is_superuser%}
                             <li><a href="{% url 'requests:request_add' %}">➕ Нова заявка</a></li>
                         {% endif %}
-                        {% if request.user|has_group:"изпълнител" or request.user.is_superuser%}
+                        {% if request.user|has_group:"ръководител" or request.user.is_superuser%}
                             <li><a href="{% url 'requests:assign_requests' %}">✏️ Разпределяне на заявки</a></li>
                         {% endif %}
                         {% if request.user|has_group:"изпълнител" or request.user.is_superuser%}
@@ -113,7 +113,8 @@
                 <div class="card-body d-none" id="reports-menu">
                     <ul class="list-unstyled">
                         {% if request.user|has_group:"ръководител" or request.user.is_superuser%}
-                            <li><a href="{% url 'reports:productivity_report' %}">📈 Преглед справки</a></li>
+                            <li><a href="{% url 'reports:productivity_report' %}">📈 Продуктивност</a></li>
+                            <li><a href="{% url 'reports:annex_status_report' %}">📝 Статус подписани анекси</a></li>
                         {% endif %}
                     </ul>
                 </div>

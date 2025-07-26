@@ -1,0 +1,9 @@
+<form method="get" class="mb-3 d-flex justify-content-end align-items-center gap-2">
+    <label for="per_page" class="form-label mb-0">Покажи по:</label>
+    <select name="per_page" id="per_page" class="form-select w-auto" onchange="this.form.submit()">
+        <option value="5" {% if request.GET.per_page == '5' or not request.GET.per_page %}selected{% endif %}>5</option>
+        <option value="10" {% if request.GET.per_page == '10' %}selected{% endif %}>10</option>
+        <option value="20" {% if request.GET.per_page == '20' %}selected{% endif %}>20</option>
+        <option value="all" {% if request.GET.per_page == 'all' %}selected{% endif %}>Всички</option>
+    </select>
+</form>

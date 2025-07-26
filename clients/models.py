@@ -25,5 +25,16 @@ class Client(models.Model):
     representative2 = models.CharField(max_length=255, blank=True, verbose_name="Три имена на представляващия дружеството")
     is_active = models.BooleanField(default=True)
 
+    def save(self, *args, **kwargs):
+        is_becoming_inactive = self.pk and self.is_active is False and Client.objects.get(pk=self.pk).is_active
+
+        super().save(*args, **kwargs)
+
+        if is_becoming_inactive:
+            # деактивирай договори и заявки
+            self.contract_set.update(is_active=False)
+            self.request_set.update(is_active=False)
+            self.request_set.filter(status='in_progress').update(status='rejected')
+
     def __str__(self):
         return f"{self.name} ({self.eik})"

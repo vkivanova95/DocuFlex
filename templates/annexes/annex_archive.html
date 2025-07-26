@@ -2,40 +2,23 @@
 {% load static %}
 
 {% block content %}
-<div class="container">
+<div class="card shadow-sm p-4">
   <div class="card shadow-sm p-4">
     <h4 class="custom-header">Регистър на изготвените анекси</h4>
 
-      <form method="get" class="mb-3 d-flex justify-content-end align-items-center gap-2">
-        <label for="per_page" class="form-label mb-0">Покажи по:</label>
-        <select name="per_page" id="per_page" class="form-select w-auto" onchange="this.form.submit()">
-            <option value="5" {% if request.GET.per_page == '5' %}selected{% endif %}>5</option>
-            <option value="10" {% if request.GET.per_page == '10' or not request.GET.per_page %}selected{% endif %}>10</option>
-            <option value="20" {% if request.GET.per_page == '20' %}selected{% endif %}>20</option>
-            <option value="all" {% if request.GET.per_page == 'all' %}selected{% endif %}>Всички</option>
-        </select>
+      {% include 'pagination_control.html' %}
+
+    <form method="get" class="d-flex flex-wrap align-items-end gap-2 mb-4">
+      <input type="text" name="request_number" value="{{ filters.request_number }}" class="form-control w-auto" placeholder="Заявка №">
+      <input type="text" name="eik" value="{{ filters.eik }}" class="form-control w-auto" placeholder="ЕИК">
+      <input type="text" name="contract_number" value="{{ filters.contract_number }}" class="form-control w-auto" placeholder="Договор №">
+
+      <button type="submit" class="btn btn-outline-primary">🔍 Търси</button>
+      <a href="{% url 'annexes:annex_archive' %}" class="btn btn-outline-danger">✖ Изчисти</a>
     </form>
 
-      <form method="get" class="row g-2 mb-4">
-      <div class="col-md-2">
-        <input type="text" name="request_number" value="{{ filters.request_number }}" class="form-control" placeholder="Заявка №">
-      </div>
-      <div class="col-md-2">
-        <input type="text" name="eik" value="{{ filters.eik }}" class="form-control" placeholder="ЕИК">
-      </div>
-      <div class="col-md-2">
-        <input type="text" name="contract_number" value="{{ filters.contract_number }}" class="form-control" placeholder="Договор №">
-      </div>
-
-
-      <div class="col-md-12 text-end mt-2">
-        <button type="submit" class="btn btn-outline-secondary">🔍 Търси</button>
-        <a href="{% url 'annexes:annex_archive' %}" class="btn btn-outline-danger">✖ Изчисти</a>
-      </div>
-    </form>
-
-    <table class="table table-bordered table-hover">
-      <thead class="table-light">
+    <table class="table table-striped">
+      <thead>
         <tr>
           <th>Заявка №</th>
           <th>Клиент</th>
@@ -58,8 +41,8 @@
           <td>{{ annex.created_at|date:"d.m.Y H:i" }}</td>
           <td>{{ annex.request.maker.get_full_name|default:annex.request.maker.username }}</td>
           <td>
-            <a href="{{ annex.file_path.url }}" target="_blank" class="btn btn-outline-secondary mb-2">Преглед</a>
-            <a href="{% url 'api:send_annex' pk=annex.id %}" class="btn btn-outline-danger">📝 Изпрати за подпис</a>
+            <a href="{{ annex.file_path.url }}" target="_blank" class="btn btn-outline-primary mb-2">Преглед</a>
+            <a href="{% url 'api:send_annex' pk=annex.id %}" class="btn btn-outline-success mb-2">За подпис</a>
           </td>
         </tr>
         {% empty %}

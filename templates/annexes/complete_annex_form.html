@@ -14,12 +14,12 @@
         <h5 class="mt-4">📄 Данни от заявка</h5>
         <div class="row">
           <div class="col-md-3 mb-3">
-            <label class="form-label">Request number:</label>
+            <label class="form-label">Заявка №:</label>
             <input type="text" class="form-control" value="{{ form.request_number.value }}" disabled>
             {{ form.request_number.as_hidden }}
           </div>
           <div class="col-md-3 mb-3">
-            <label class="form-label">Annex number:</label>
+            <label class="form-label">Анекс №:</label>
             <input type="text" class="form-control" value="{{ form.annex_number.value }}" disabled>
             {{ form.annex_number.as_hidden }}
           </div>
@@ -192,7 +192,7 @@
   if (addFormBtn) {
     addFormBtn.addEventListener('click', function () {
       const currentFormCount = parseInt(totalForms.value);
-      const lastForm = formsetArea.querySelector('.form-group');  // 👈 точно това търси
+      const lastForm = formsetArea.querySelector('.form-group');
       const newForm = lastForm.cloneNode(true);
 
       // Изчистване на стойността

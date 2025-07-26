@@ -1,7 +1,8 @@
-from common.mixins import GroupRequiredMixin
+from common.mixins import GroupRequiredMixin, PaginationMixin
 from django import forms
 from django.contrib.auth.mixins import LoginRequiredMixin
 from common.forms import BaseStyledForm
+from .choices import RequestStatus
 from .forms import RequestForm, RequestExecutionForm
 from django.views.generic import View, UpdateView, DetailView, ListView
 from django.http import HttpResponseRedirect
@@ -133,7 +134,7 @@ class RequestSubmitView(LoginRequiredMixin, GroupRequiredMixin, View):
 
 
 class AssignRequestsView(LoginRequiredMixin, GroupRequiredMixin, View):
-    allowed_groups = ['изпълнител']
+    allowed_groups = ['ръководител']
 
     def get(self, request):
         pending_requests = Request.objects.filter(maker__isnull=True)
@@ -160,22 +161,28 @@ class AssignedRequestsListView(LoginRequiredMixin, GroupRequiredMixin, View):
     def get(self, request):
         current_user = request.user
         selected_executor_id = request.GET.get('executor')
-
         executors = get_executors()
-        requests_qs = Request.objects.filter(maker__isnull=False)
+        requests_qs = Request.objects.filter(maker__isnull=False, status=RequestStatus.IN_PROGRESS)
+
+        is_superadmin = current_user.is_superuser
+        is_executor = current_user.groups.filter(name='изпълнител').exists()
 
         if selected_executor_id:
             if selected_executor_id != 'all':
                 requests_qs = requests_qs.filter(maker_id=selected_executor_id)
         else:
-            # Ако не е избрано нищо – по дифолт се показват заявките на текущия потребител
-            requests_qs = requests_qs.filter(maker=current_user)
+            if is_superadmin:
+                selected_executor_id = 'all'
+            elif is_executor:
+                requests_qs = requests_qs.filter(maker=current_user)
+                selected_executor_id = str(current_user.id)
 
         return render(request, 'requests/assigned_requests.html', {
             'requests': requests_qs,
             'executors': executors,
-            'selected_executor': selected_executor_id or str(current_user.id),
+            'selected_executor': selected_executor_id,
         })
+
 
 class RequestDetailView(LoginRequiredMixin, GroupRequiredMixin, LogActionMixin, UpdateView):
     model = Request
@@ -190,11 +197,10 @@ class RequestDetailView(LoginRequiredMixin, GroupRequiredMixin, LogActionMixin, 
         return super().form_valid(form)
 
 
-class RequestListView(LoginRequiredMixin, GroupRequiredMixin, ListView):
+class RequestListView(LoginRequiredMixin, GroupRequiredMixin, PaginationMixin, ListView):
     model = Request
     template_name = 'requests/request_list_all.html'
     context_object_name = 'requests'
-    paginate_by = 10
     allowed_groups = ['изпълнител', 'бизнес', 'ръководител']
 
     def get_queryset(self):
@@ -230,11 +236,6 @@ class RequestListView(LoginRequiredMixin, GroupRequiredMixin, ListView):
 
         return queryset
 
-    def get_paginate_by(self, queryset):
-        per_page = self.request.GET.get('per_page')
-        if per_page == 'all':
-            return queryset.count()
-        return per_page or self.paginate_by
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

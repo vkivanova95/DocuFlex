@@ -49,7 +49,7 @@
         </div>
         <div class="col-md-6 mb-3">
             <label class="form-label">Сума</label>
-            <input type="text" class="form-control" value="{{ request_obj.amount }} {{ request_obj.currency }}" disabled>
+            <input type="text" class="form-control" value="{{ request_obj.amount|floatformat:2|intcomma }} {{ request_obj.currency }}" disabled>
         </div>
     </div>
     <p>
@@ -71,7 +71,7 @@
         </div>
         <div class="col-md-4 mb-3">
             <label class="form-label">Корекции по анекса</label>
-            <input type="text" class="form-control" value="{{ request_obj.correction_required|default:"—" }}" disabled>
+            <input type="text" class="form-control" value="{% if form.instance.correction_required %}Да{% else %}Не{% endif %}" disabled>
         </div>
         <div class="col-md-4 mb-3">
             <label class="form-label">Дата подпис</label>
@@ -82,7 +82,7 @@
 
     </p>
     <div class="col-md-2">
-        <a href="{% url 'requests:request_list_all' %}" class="btn btn-primary w-100">Назад</a>
+        <a href="{% url 'requests:request_list_all' %}" class="btn btn-outline-primary w-100">⬅️ Назад</a>
     </div>
 
 </div>

@@ -8,7 +8,7 @@ from common.mixins import AnnexFormBehaviorMixin
 class BaseAnnexStartForm(forms.Form):
     request_number = forms.CharField(label="Номер на заявка", widget=forms.TextInput(attrs={'class': 'form-control'}))
     annex_number = forms.CharField(label="Анекс №", widget=forms.TextInput(attrs={'class': 'form-control'}))
-    annex_date = styled_datefield(label="Анекс дата")  # вече съдържа class='form-control'
+    annex_date = styled_datefield(label="Анекс дата")
     city = forms.CharField(label="Град", widget=forms.TextInput(attrs={'class': 'form-control'}))
 
 
@@ -31,9 +31,15 @@ class AnnexStandardForm(AnnexFormBehaviorMixin, StartFieldsMixin, BaseStyledSimp
 
         return cleaned_data
 
-    new_amount_reduction = forms.CharField(required=False)
-    amount_increase = forms.CharField(required=False)
-    new_amount_increase = forms.CharField(required=False)
+    new_amount_reduction = forms.CharField(required=False, widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'напр. 100 000.00 лева'}))
+    amount_increase = forms.CharField(required=False, widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'напр. 100 000.00 лева'}))
+    new_amount_increase = forms.CharField(required=False, widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'напр. 100 000.00 лева'}))
 
     stop_disbursement = forms.BooleanField(label="Прекратяване на усвояването", required=False)
 
@@ -44,19 +50,33 @@ class AnnexStandardForm(AnnexFormBehaviorMixin, StartFieldsMixin, BaseStyledSimp
     repayment_plan = forms.BooleanField(required=False)
     new_ceiling = forms.BooleanField(required=False)
 
-    new_interest = forms.CharField(required=False)
-    fee_review = forms.CharField(required=False)
-    fee_management = forms.CharField(required=False)
-    fee_commitment = forms.CharField(required=False)
+    new_interest = forms.CharField(required=False, widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'напр. 3-месечен Юрибор + 5%'}))
+    fee_review = forms.CharField(required=False, widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'напр. 1 000 лева'}))
+    fee_management = forms.CharField(required=False, widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'напр. 0,5%'}))
+    fee_commitment = forms.CharField(required=False, widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'напр. 0,5%'}))
     no_fees = forms.BooleanField(required=False)
 
     other_V = forms.CharField(label="Друго V", required=False)
 
 
 class AnnexDeletionForm(AnnexFormBehaviorMixin, StartFieldsMixin, BaseAnnexStartForm):
-    repaid_amount = forms.CharField(label="Погасена сума", required=True, widget=forms.TextInput(attrs={'class': 'form-control'}))
-    deed_number = forms.CharField(label="Нотариален акт №", required=True, widget=forms.TextInput(attrs={'class': 'form-control'}))
-    collateral_description = forms.CharField(label="Описание на обезпечението", required=True,widget=forms.TextInput(attrs={'class': 'form-control'}))
+    repaid_amount = forms.CharField(label="Погасена сума", required=True, widget=forms.TextInput(attrs={
+        'class': 'form-control',
+        'placeholder': 'напр. 100 000 лева'}))
+    deed_number = forms.CharField(label="Нотариален акт №", required=True, widget=forms.TextInput(attrs={
+        'class': 'form-control',
+        'placeholder': 'напр. 102/31.01.2024'}))
+    collateral_description = forms.CharField(label="Описание на обезпечението", required=True,widget=forms.TextInput(attrs={
+        'class': 'form-control',
+        'placeholder': 'описание на заличавания имот'}))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

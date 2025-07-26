@@ -5,6 +5,10 @@
 
     <label>Upload annex file:</label>
     <input type="file" name="annex_file" required><br>
+    {% if annex.request.client.is_active and annex.request.loan_agreement.is_active %}
+        <a href="{% url 'api:send_annex' annex.pk %}" class="btn btn-sm btn-outline-primary">Изпрати за подпис</a>
+    {% else %}
+        <button class="btn btn-sm btn-outline-secondary" disabled>Клиентът или договорът е неактивен</button>
+    {% endif %}
 
-    <button type="submit">Send to Signature</button>
 </form>

@@ -21,6 +21,10 @@ class Request(models.Model):
     status = models.CharField(max_length=20, choices=RequestStatus.choices, default=RequestStatus.IN_PROGRESS)
     request_number = models.CharField(max_length=30, unique=True, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"{self.request_number} – {self.status}"
 
     def save(self, *args, **kwargs):
         if not self.request_number:
@@ -30,4 +34,7 @@ class Request(models.Model):
             else:
                 new_number = 1
             self.request_number = f"{new_number:04d}"
+
         super().save(*args, **kwargs)
+
+

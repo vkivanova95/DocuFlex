@@ -1,6 +1,6 @@
 from django.contrib.auth.views import LoginView
 from django.urls import reverse_lazy
-from django.views.generic import FormView
+from django.views.generic import FormView, ListView
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
 from django.views import View
@@ -8,8 +8,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import get_user_model
 from .forms import UserCreateForm, UserUpdateForm, PasswordResetForm
 from django.views.generic import TemplateView
-from common.mixins import GroupRequiredMixin
+from common.mixins import GroupRequiredMixin, PaginationMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Q
 
 
 def home_redirect_view(request):
@@ -80,12 +81,30 @@ class UserCreateView(LoginRequiredMixin, GroupRequiredMixin, View):
         return render(request, 'users/create_user.html', {'form': form})
 
 
-class UserListView(LoginRequiredMixin, GroupRequiredMixin, View):
+class UserListView(LoginRequiredMixin, GroupRequiredMixin, PaginationMixin, ListView):
+    model = User
+    template_name = 'users/user_list.html'
+    context_object_name = 'users'
     allowed_groups = ['ръководител']
 
-    def get(self, request):
-        users = User.objects.all()
-        return render(request, 'users/user_list.html', {'users': users})
+    def get_queryset(self):
+        query = self.request.GET.get('search', '')
+        qs = super().get_queryset().prefetch_related('groups')
+
+        if query:
+            qs = qs.filter(
+                Q(username__icontains=query) |
+                Q(first_name__icontains=query) |
+                Q(last_name__icontains=query) |
+                Q(groups__name__icontains=query)
+            ).distinct()
+
+        return qs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['search_query'] = self.request.GET.get('search', '')
+        return context
 
 
 class UserEditView(LoginRequiredMixin, GroupRequiredMixin, View):

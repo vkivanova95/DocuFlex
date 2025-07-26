@@ -4,7 +4,7 @@
     <h4 class="custom-header mb-4">Номенклатура видове кредит</h4>
 
     <div class="text-start mb-3">
-        <a href="{% url 'nomenclatures:nomenclature_list' %}" class="btn btn-outline-secondary mb-2">Назад</a>
+        <a href="{% url 'nomenclatures:nomenclature_list' %}" class="btn btn-outline-primary mb-2">⬅️ Назад</a>
     </div>
 <p>
 
@@ -15,7 +15,7 @@
         {% if query %}
             <a href="{% url 'nomenclatures:loan_type_list' %}" class="btn btn-outline-danger">✖ Изчисти</a>
         {% else %}
-            <button type="submit" class="btn btn-outline-secondary">🔍 Търси</button>
+            <button type="submit" class="btn btn-outline-primary">🔍 Търси</button>
         {% endif %}
     </form>
 
@@ -27,7 +27,7 @@
                 </div>
                 <form method="post" action="{% url 'nomenclatures:toggle-nomenclature-status' 'credit' c.id %}">
                     {% csrf_token %}
-                    <button type="submit" class="btn btn-outline-secondary" title="Смени статус"><-></button>
+                    <button type="submit" class="btn btn-outline-primary" title="Смени статус"><-></button>
                 </form>
             </li>
         {% empty %}

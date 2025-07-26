@@ -2,29 +2,26 @@
 {% block content %}
 <div class="container mt-4">
   <div class="card p-4 shadow-sm">
-    <h4 class="mb-3">Справка продуктивност</h4>
+    <h4 class="mb-3">Обработени заявки</h4>
 
     <form method="get" class="row g-2 mb-3">
       <div class="col-md-4">
         <label>Начална дата</label>
-{#        <input type="date" name="start_date" value="{{ start_date }}" class="form-control">#}
         <input type="date" name="start_date" value="{{ start_date|date:'Y-m-d' }}" class="form-control">
       </div>
       <div class="col-md-4">
         <label>Крайна дата</label>
-{#        <input type="date" name="end_date" value="{{ end_date }}" class="form-control">#}
         <input type="date" name="end_date" value="{{ end_date|date:'Y-m-d' }}" class="form-control">
       </div>
       <div class="col-md-4 d-flex align-items-end justify-content-end">
-        <button type="submit" class="btn btn-outline-secondary me-2">🔍 Търси</button>
+        <button type="submit" class="btn btn-outline-primary me-2">🔍 Търси</button>
         <a href="{% url 'reports:productivity_report' %}" class="btn btn-outline-danger me-2">✖ Изчисти</a>
-          <button type="submit" name="export" value="1" class="btn btn-outline-success me-2">📤 Excel</button>
-
+        <button type="submit" name="export" value="1" class="btn btn-outline-success me-2">📤 Excel</button>
       </div>
     </form>
 
-    <table class="table table-bordered table-hover">
-      <thead class="table-light">
+    <table class="table table-striped">
+      <thead>
         <tr>
           <th>Изпълнител</th>
           <th>Брой заявки</th>

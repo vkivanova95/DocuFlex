@@ -1,23 +1,25 @@
 {% if is_paginated %}
+{% load query_transform %}
 <nav class="d-flex justify-content-center">
     <ul class="pagination">
         {% if page_obj.has_previous %}
             <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.previous_page_number }}&per_page={{ request.GET.per_page }}">Назад</a>
+                <a class="page-link" href="?{% query_transform request page=page_obj.previous_page_number %}">Назад</a>
             </li>
         {% endif %}
 
         {% for num in paginator.page_range %}
             <li class="page-item {% if page_obj.number == num %}active{% endif %}">
-                <a class="page-link" href="?page={{ num }}&per_page={{ request.GET.per_page }}">{{ num }}</a>
+                <a class="page-link" href="?{% query_transform request page=num %}">{{ num }}</a>
             </li>
         {% endfor %}
 
         {% if page_obj.has_next %}
             <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.next_page_number }}&per_page={{ request.GET.per_page }}">Напред</a>
+                <a class="page-link" href="?{% query_transform request page=page_obj.next_page_number %}">Напред</a>
             </li>
         {% endif %}
     </ul>
 </nav>
 {% endif %}
+

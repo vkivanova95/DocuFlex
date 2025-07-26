@@ -5,7 +5,7 @@
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit" name="save_user" class="btn btn-primary">Запази</button>
+        <button type="submit" name="save_user" class="btn btn-primary">Запази данните</button>
     </form>
 
     <hr class="my-4">
@@ -16,10 +16,10 @@
     <form method="post">
         {% csrf_token %}
         {{ password_form.as_p }}
-        <button type="submit" name="reset_password" class="btn btn-secondary ms-2">Смени парола</button>
+        <button type="submit" name="reset_password" class="btn btn-primary ms-2">Смени парола</button>
         <hr class="my-4">
         <div>
-            <a href="{% url 'users:user-list' %}" class="btn btn-outline-secondary ms-2">Назад към списък с потребители</a>
+            <a href="{% url 'users:user-list' %}" class="btn btn-outline-primary ms-2">⬅️ Назад</a>
         </div>
     </form>
 </div>

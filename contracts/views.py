@@ -1,4 +1,4 @@
-from common.mixins import GroupRequiredMixin
+from common.mixins import GroupRequiredMixin, PaginationMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.db.models import Q
@@ -95,11 +95,10 @@ class ContractUpdateView(LoginRequiredMixin, GroupRequiredMixin, SuccessMessageM
         return super().form_valid(form)
 
 
-class ContractListView(LoginRequiredMixin, GroupRequiredMixin, ListView):
+class ContractListView(LoginRequiredMixin, GroupRequiredMixin, PaginationMixin, ListView):
     model = Contract
     template_name = 'contracts/contract_list.html'
     context_object_name = 'contracts'
-    paginate_by = 10
     allowed_groups = ['бизнес', 'ръководител', 'изпълнител']
 
     def get_queryset(self):
@@ -120,12 +119,6 @@ class ContractListView(LoginRequiredMixin, GroupRequiredMixin, ListView):
             queryset = queryset.filter(is_active=(status == 'active'))
 
         return queryset
-
-    def get_paginate_by(self, queryset):
-        per_page = self.request.GET.get('per_page')
-        if per_page == 'all':
-            return queryset.count()
-        return per_page or self.paginate_by
 
 
 class ContractDeactivateView(LoginRequiredMixin, GroupRequiredMixin, View):

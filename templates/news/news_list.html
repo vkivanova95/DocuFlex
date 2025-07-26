@@ -7,7 +7,7 @@
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h4 class="custom-header">Всички новини</h4>
         {% if request.user|has_group:"ръководител" or request.user.is_superuser %}
-            <a href="{% url 'news:add_news' %}" class="btn btn-outline-secondary">Добави новина</a>
+            <a href="{% url 'news:add_news' %}" class="btn btn-primary">Добави новина</a>
         {% endif %}
     </div>
 

@@ -5,13 +5,13 @@
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Запази</button>
+        <button type="submit" class="btn btn-primary ms-2">Запази данните</button>
     </form>
     <p>
 
     </p>
     <div>
-        <a href="{% url 'users:user-list' %}" class="btn btn-outline-secondary ms-2">Назад към списък с потребители</a>
+        <a href="{% url 'users:user-list' %}" class="btn btn-outline-primary ms-2">⬅️ Назад</a>
     </div>
 </div>
 {% endblock %}

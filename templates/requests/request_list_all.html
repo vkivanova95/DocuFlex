@@ -2,7 +2,9 @@
 {% load static %}
 
 {% block content %}
+<div class="card shadow-sm p-4">
 <h4 class="custom-header mb-4">Всички заявки</h4>
+    {% include 'pagination_control.html' %}
 <div class="row">
     <form method="get" class="row g-3 mb-4">
     <div class="col-md-3">
@@ -46,10 +48,10 @@
     </div>
 
     <div class="col-md-2">
-        <button type="submit" class="btn btn-primary w-100">Филтрирай</button>
+        <button type="submit" class="btn btn-outline-primary w-100">🔍 Търси</button>
     </div>
     <div class="col-md-2">
-        <a href="{% url 'requests:request_list_all' %}" class="btn btn-primary w-100">Изчисти филтрите</a>
+        <a href="{% url 'requests:request_list_all' %}" class="btn btn-outline-danger w-100">✖ Изчисти</a>
     </div>
 
 </form>
@@ -90,5 +92,6 @@
 <p>
 
 </p>
+</div>
 {% include "pagination.html" with page_obj=page_obj %}
 {% endblock %}

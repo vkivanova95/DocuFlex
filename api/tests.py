@@ -38,7 +38,7 @@ class SendAnnexToMockAPITest(TestCase):
     def test_send_annex_to_mock_api(self):
         response = self.client.get(reverse_lazy('api:send_annex', kwargs={'pk': self.annex.pk}))
         self.assertEqual(response.status_code, 200)
-        self.assertIn('status', response.context)  # резултатит е доставен, не връща JSON
+        self.assertIn('status', response.context)  # резултатът е доставен, не връща JSON
 
     def test_mock_sign_annex_returns_success(self):
         # ако е истинско API връща JSON, симулира входни данни

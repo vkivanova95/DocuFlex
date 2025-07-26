@@ -28,7 +28,6 @@ urlpatterns = [
 
     # Останалите аппове (изискват login)
     path('clients/', include('clients.urls', namespace='clients')),
-    # path('', include('common.urls')),
     path('contracts/', include('contracts.urls', namespace='contracts')),
     path('loan_requests/', include(('loan_requests.urls', 'requests'), namespace='requests')),
     path('annexes/', include('annexes.urls', namespace='annexes')),

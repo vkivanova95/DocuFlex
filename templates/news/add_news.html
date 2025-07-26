@@ -3,7 +3,9 @@
 
 <div class="card shadow-sm p-4">
     <div class="text-center mb-3">
-        <h4 class="custom-header">Добавяне на новина</h4>
+         <h4 class="custom-header">
+            {% if object %}Редакция на новина {% else %}Добавяне на новина{% endif %}
+        </h4>
     </div>
 
     <form method="post">
@@ -25,13 +27,13 @@
                 Активна новина
             </label>
         </div>
-    <button type="submit" class="btn btn-primary">Запиши</button>
+    <button type="submit" class="btn btn-primary">Запиши новината</button>
     </form>
     <p>
 
     </p>
     <div>
-        <a href="{% url 'news:news_list' %}" class="btn btn-outline-secondary">Назад към списъка</a>
+        <a href="{% url 'news:news_list' %}" class="btn btn-outline-primary">⬅️ Назад към списъка</a>
     </div>
 </div>
 {% endblock %}

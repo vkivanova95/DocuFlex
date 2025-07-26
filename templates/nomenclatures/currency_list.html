@@ -4,7 +4,7 @@
     <h4 class="custom-header mb-4">Номенклатура валути</h4>
 
     <div class="text-start">
-        <a href="{% url 'nomenclatures:nomenclature_list' %}" class="btn btn-outline-secondary mb-2">Назад</a>
+        <a href="{% url 'nomenclatures:nomenclature_list' %}" class="btn btn-outline-primary mb-2">⬅️ Назад</a>
     </div>
 <p>
 
@@ -15,7 +15,7 @@
         {% if query %}
             <a href="{% url 'nomenclatures:currency_list' %}" class="btn btn-outline-danger">✖ Изчисти</a>
         {% else %}
-            <button type="submit" class="btn btn-outline-secondary">🔍 Търси</button>
+            <button type="submit" class="btn btn-outline-primary">🔍 Търси</button>
         {% endif %}
     </form>
 
@@ -28,7 +28,7 @@
                 </div>
                 <form method="post" action="{% url 'nomenclatures:toggle-nomenclature-status' 'currency' c.id %}">
                     {% csrf_token %}
-                    <button type="submit" class="btn btn-outline-secondary ms-2" title="Смени статус"><-> ️</button>
+                    <button type="submit" class="btn btn-outline-primary ms-2" title="Смени статус"><-> ️</button>
                 </form>
             </li>
         {% empty %}

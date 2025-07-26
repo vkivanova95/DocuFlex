@@ -1,7 +1,9 @@
-from common.mixins import GroupRequiredMixin
+from common.mixins import GroupRequiredMixin, AnnexPermissionMixin, PaginationMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views import View
 from django.shortcuts import render, get_object_or_404, redirect
+
+from loan_requests.choices import RequestStatus
 from loan_requests.utils import get_executors
 from .forms import AnnexStandardForm, AdditionalConditionFormSet, AnnexDeletionForm, BaseAnnexStartForm
 from .models import Request, GeneratedAnnex
@@ -12,7 +14,7 @@ from logs.models import SystemLog
 from django.utils.timezone import now
 
 
-class GenerateAnnexView(LoginRequiredMixin, GroupRequiredMixin, View):
+class GenerateAnnexView(LoginRequiredMixin, GroupRequiredMixin, AnnexPermissionMixin, View):
     allowed_groups = ['изпълнител']
 
     def get(self, request):
@@ -28,11 +30,25 @@ class GenerateAnnexView(LoginRequiredMixin, GroupRequiredMixin, View):
             start_form = BaseAnnexStartForm(request.POST)
             if start_form.is_valid():
                 req = get_object_or_404(Request, request_number=start_form.cleaned_data['request_number'])
-                annex_type = req.document_type
 
+                # проверки: заявката да е В процес на работа и да е разпределена
+                if req.status != RequestStatus.IN_PROGRESS:
+                    messages.error(request,
+                                   "Анекс може да се генерира само ако заявката е в статус 'В процес на работа'.")
+                    return render(request, 'annexes/start_annex_form.html', {
+                        'start_form': start_form
+                    })
+
+                if not req.maker:
+                    messages.error(request, "Заявката не е разпределена за работа към изпълнител. Не може да се генерира анекс.")
+                    return render(request, 'annexes/start_annex_form.html', {
+                        'start_form': start_form
+                    })
+
+                # ако всичко е наред – продължава към втора стъпка
+                annex_type = req.document_type
                 form_class = self.get_form_class(annex_type)
                 form = form_class(initial=start_form.cleaned_data)
-
                 formset = AdditionalConditionFormSet() if annex_type == 'standard' else None
 
                 return render(request, 'annexes/complete_annex_form.html', {
@@ -42,7 +58,7 @@ class GenerateAnnexView(LoginRequiredMixin, GroupRequiredMixin, View):
                     'step': 'complete',
                 })
 
-            # невалидна стартова форма
+            # ако стартовата форма не е валидна
             return render(request, 'annexes/start_annex_form.html', {
                 'start_form': start_form
             })
@@ -84,6 +100,8 @@ class GenerateAnnexView(LoginRequiredMixin, GroupRequiredMixin, View):
                 annex_date=form.cleaned_data['annex_date'],
                 file_path=file_path
             )
+            req.preparation_date = now()
+            req.save()
 
             download_url = request.build_absolute_uri(annex_obj.file_path.url)
 
@@ -115,17 +133,15 @@ class GenerateAnnexView(LoginRequiredMixin, GroupRequiredMixin, View):
         return AnnexDeletionForm if annex_type == 'deletion' else AnnexStandardForm
 
 
-class AnnexArchiveView(LoginRequiredMixin, GroupRequiredMixin, ListView):
+class AnnexArchiveView(LoginRequiredMixin, GroupRequiredMixin, PaginationMixin, ListView):
     model = GeneratedAnnex
     template_name = 'annexes/annex_archive.html'
     context_object_name = 'annexes'
-    paginate_by = 10
     allowed_groups = ['бизнес', 'ръководител', 'изпълнител']
 
     def get_queryset(self):
         queryset = GeneratedAnnex.objects.select_related(
-            'request__client', 'request__loan_agreement', 'request__maker'
-        )
+            'request__client', 'request__loan_agreement', 'request__maker').filter(request__status=RequestStatus.IN_PROGRESS)
 
         request_number = self.request.GET.get('request_number')
         eik = self.request.GET.get('eik')
@@ -140,15 +156,6 @@ class AnnexArchiveView(LoginRequiredMixin, GroupRequiredMixin, ListView):
 
         return queryset
 
-    def get_paginate_by(self, queryset):
-        per_page = self.request.GET.get('per_page')
-
-        if per_page == 'all':
-            return queryset.count()  # disables pagination
-        try:
-            return int(per_page)
-        except (TypeError, ValueError):
-            return self.paginate_by
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

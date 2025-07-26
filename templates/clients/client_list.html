@@ -5,21 +5,16 @@
 <div class="card shadow-sm p-4">
     <h4 class="custom-header"> Преглед на клиентите</h4>
 
-    <form method="get" class="mb-3 d-flex justify-content-end align-items-center gap-2">
-        <label for="per_page" class="form-label mb-0">Покажи по:</label>
-        <select name="per_page" id="per_page" class="form-select w-auto" onchange="this.form.submit()">
-            <option value="5" {% if request.GET.per_page == '5' %}selected{% endif %}>5</option>
-            <option value="10" {% if request.GET.per_page == '10' or not request.GET.per_page %}selected{% endif %}>10</option>
-            <option value="20" {% if request.GET.per_page == '20' %}selected{% endif %}>20</option>
-            <option value="all" {% if request.GET.per_page == 'all' %}selected{% endif %}>Всички</option>
-        </select>
-    </form>
+    {% include 'pagination_control.html' %}
+
     <form method="get" class="mb-3 d-flex justify-content-end">
         <input type="text" name="search" value="{{ search_query }}" class="form-control me-2" placeholder="Търси по ЕИК или име">
-        <button type="submit" class="btn btn-primary">🔍</button>
+        <button type="submit" class="btn btn-primary me-2 d-flex align-items-center">
+            <span class="me-1">🔍</span> Търси
+        </button>
     </form>
-    <table class="table table-bordered table-hover">
-        <thead class="table-primary text-center">
+    <table class="table table-striped">
+        <thead>
             <tr>
                 <th>ЕИК</th>
                 <th>Име</th>

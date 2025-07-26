@@ -1,4 +1,4 @@
-from common.mixins import GroupRequiredMixin
+from common.mixins import GroupRequiredMixin, PaginationMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.db.models import Q
@@ -73,18 +73,11 @@ class ClientEIKLookupView(LoginRequiredMixin, GroupRequiredMixin, View):
         return render(request, self.template_name, {'form': form})
 
 
-class ClientListView(LoginRequiredMixin, GroupRequiredMixin, ListView):
+class ClientListView(LoginRequiredMixin, GroupRequiredMixin, PaginationMixin, ListView):
     model = Client
     template_name = 'clients/client_list.html'
     context_object_name = 'clients'
-    paginate_by = 10
     allowed_groups = ['бизнес', 'ръководител', 'изпълнител']
-
-    def get_paginate_by(self, queryset):
-        per_page = self.request.GET.get('per_page')
-        if per_page == 'all':
-            return None
-        return int(per_page) if per_page and per_page.isdigit() else self.paginate_by
 
     def get_queryset(self):
         queryset = Client.objects.all().order_by('name')

@@ -20,14 +20,14 @@ body {
 }
 
 .card-header {
-    background-color: #004080;
+    background-color: #003366;
     color: #ffffff;
     font-size: 1rem;
     padding: 0.75rem 1rem;
 }
 
 .card-body a {
-    color: #004080;
+    color: #003366;
     display: block;
     padding: 0.3rem 0;
     text-decoration: none;
@@ -50,16 +50,31 @@ h5 {
     text-align: left;
 }
 
+.btn {
+    padding: 0.375rem 0.75rem;
+    font-weight: 400;
+}
+
 .btn-primary {
-    background-color: #004080;
-    border-color: #004080;
-    padding: 0.6rem 1.2rem;
-    font-weight: 500;
+    background-color: #003366;
+    border-color: #003366;
+    /*padding: 0.6rem 1.2rem;*/
+    /*font-weight: 500;*/
 }
 
 .btn-primary:hover {
-    background-color: #002c5f;
-    border-color: #002c5f;
+    background-color: #003366;
+    border-color: #003366;
+}
+
+.btn-outline-primary {
+    color: #003366;
+    border-color: #003366;
+}
+
+.btn-outline-primary:hover {
+    background-color: #003366;
+    color: white;
 }
 
 .custom-header {
@@ -81,8 +96,8 @@ form .form-check-label {
 }
 
 .form-check-input:checked {
-    background-color: #004080;
-    border-color: #004080;
+    background-color: #003366;
+    border-color: #003366;
 }
 
 .errorlist {
@@ -126,13 +141,13 @@ input:focus:invalid, select:focus:invalid, textarea:focus:invalid {
     border: none;
     padding: 0;
     font: inherit;
-    color: #007bff;
+    color: #003366;
     text-decoration: underline;
     cursor: pointer;
 }
 
 .logout-link:hover {
-    color: #0056b3;
+    color: #003366;
 }
 
 
