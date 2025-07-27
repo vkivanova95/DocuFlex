@@ -10,6 +10,15 @@
             <a href="{% url 'news:add_news' %}" class="btn btn-primary">Добави новина</a>
         {% endif %}
     </div>
+    {% include 'pagination_control.html' %}
+
+    <form method="get" class="d-flex flex-wrap align-items-center gap-2 mb-3">
+        <input type="text" name="q" class="form-control w-auto" placeholder="Търси по заглавие"
+               value="{{ q }}">
+        <input type="hidden" name="per_page" value="{{ per_page }}">
+        <button type="submit" class="btn btn-outline-primary">🔍 Търси</button>
+        <a href="{% url 'news:news_list' %}" class="btn btn-outline-danger">❌ Изчисти</a>
+    </form>
 
     <table class="table table-striped">
         <thead>

@@ -202,37 +202,32 @@ class RequestListView(LoginRequiredMixin, GroupRequiredMixin, PaginationMixin, L
     template_name = 'requests/request_list_all.html'
     context_object_name = 'requests'
     allowed_groups = ['изпълнител', 'бизнес', 'ръководител']
+    ordering = ['request_number']
 
     def get_queryset(self):
-        return self.apply_filters(Request.objects.select_related('client', 'loan_agreement', 'maker'))
+        queryset = super().get_queryset().select_related('client', 'loan_agreement', 'maker')
+        return self.apply_filters(queryset)
 
     def apply_filters(self, queryset):
-        filters = {
-            'name': self.request.GET.get('name', ''),
-            'eik': self.request.GET.get('eik', ''),
-            'contract': self.request.GET.get('contract', ''),
-            'maker': self.request.GET.get('maker', ''),
-            'document_type': self.request.GET.get('document_type', ''),
-            'status': self.request.GET.get('status', ''),
-        }
+        request_number = self.request.GET.get('request_number', '').strip()
+        eik = self.request.GET.get('eik', '').strip()
+        contract = self.request.GET.get('contract', '').strip()
+        maker = self.request.GET.get('maker', '').strip()
+        document_type = self.request.GET.get('document_type', '').strip()
+        status = self.request.GET.get('status', '').strip()
 
-        if filters['name']:
-            queryset = queryset.filter(client__name__icontains=filters['name'])
-
-        if filters['eik']:
-            queryset = queryset.filter(client__eik__icontains=filters['eik'])
-
-        if filters['contract']:
-            queryset = queryset.filter(loan_agreement__contract_number__icontains=filters['contract'])
-
-        if filters['maker']:
-            queryset = queryset.filter(maker_id=filters['maker'])
-
-        if filters['document_type']:
-            queryset = queryset.filter(document_type=filters['document_type'])
-
-        if filters['status']:
-            queryset = queryset.filter(status=filters['status'])
+        if request_number:
+            queryset = queryset.filter(request_number=request_number)
+        if eik:
+            queryset = queryset.filter(client__eik__icontains=eik)
+        if contract:
+            queryset = queryset.filter(loan_agreement__contract_number__icontains=contract)
+        if maker:
+            queryset = queryset.filter(maker_id=maker)
+        if document_type:
+            queryset = queryset.filter(document_type=document_type)
+        if status:
+            queryset = queryset.filter(status=status)
 
         return queryset
 
@@ -241,14 +236,14 @@ class RequestListView(LoginRequiredMixin, GroupRequiredMixin, PaginationMixin, L
         context = super().get_context_data(**kwargs)
         context['makers'] = get_executors()
         context['filters'] = {
-            'name': self.request.GET.get('name', ''),
+            'request_number': self.request.GET.get('request_number', ''),
             'eik': self.request.GET.get('eik', ''),
             'contract': self.request.GET.get('contract', ''),
             'maker': self.request.GET.get('maker', ''),
             'document_type': self.request.GET.get('document_type', ''),
             'status': self.request.GET.get('status', ''),
         }
-        context['per_page'] = self.get_paginate_by(self.get_queryset())
+        context['per_page'] = self.request.GET.get('per_page', str(self.paginate_by))
         return context
 
 

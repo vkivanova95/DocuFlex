@@ -138,14 +138,17 @@ class AnnexArchiveView(LoginRequiredMixin, GroupRequiredMixin, PaginationMixin, 
     template_name = 'annexes/annex_archive.html'
     context_object_name = 'annexes'
     allowed_groups = ['бизнес', 'ръководител', 'изпълнител']
+    ordering = ['-created_at']
 
     def get_queryset(self):
-        queryset = GeneratedAnnex.objects.select_related(
+        queryset = super().get_queryset().select_related(
             'request__client', 'request__loan_agreement', 'request__maker').filter(request__status=RequestStatus.IN_PROGRESS)
+        return self.apply_filters(queryset)
 
-        request_number = self.request.GET.get('request_number')
-        eik = self.request.GET.get('eik')
-        contract_number = self.request.GET.get('contract_number')
+    def apply_filters(self, queryset):
+        request_number = self.request.GET.get('request_number', '').strip()
+        eik = self.request.GET.get('eik', '').strip()
+        contract_number = self.request.GET.get('contract_number', '').strip()
 
         if request_number:
             queryset = queryset.filter(request__request_number__icontains=request_number)

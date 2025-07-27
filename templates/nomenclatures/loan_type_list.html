@@ -6,17 +6,16 @@
     <div class="text-start mb-3">
         <a href="{% url 'nomenclatures:nomenclature_list' %}" class="btn btn-outline-primary mb-2">⬅️ Назад</a>
     </div>
+    {% include 'pagination_control.html' %}
 <p>
 
 </p>
     <!-- Търсене -->
     <form method="get" class="input-group mb-4">
-        <input type="text" name="q" class="form-control" placeholder="Търси по тип..." value="{{ query }}">
-        {% if query %}
-            <a href="{% url 'nomenclatures:loan_type_list' %}" class="btn btn-outline-danger">✖ Изчисти</a>
-        {% else %}
-            <button type="submit" class="btn btn-outline-primary">🔍 Търси</button>
-        {% endif %}
+        <input type="text" name="q" class="form-control" placeholder="Търси по вид кредит" value="{{ query }}">
+        <input type="hidden" name="per_page" value="{{ per_page }}">
+        <button type="submit" class="btn btn-outline-primary me-2">🔍 Търси</button>
+        <a href="{% url 'nomenclatures:loan_type_list' %}" class="btn btn-outline-danger">❌ Изчисти</a>
     </form>
 
     <ul class="list-group">
@@ -35,4 +34,5 @@
         {% endfor %}
     </ul>
 </div>
+     {% include "pagination.html" with page_obj=page_obj %}
 {% endblock %}

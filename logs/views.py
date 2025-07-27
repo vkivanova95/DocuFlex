@@ -15,8 +15,11 @@ class SystemLogListView(LoginRequiredMixin, PaginationMixin, ListView):
     ordering = ['-timestamp']
 
     def get_queryset(self):
-        queryset = SystemLog.objects.all().order_by('-timestamp')
-        query = self.request.GET.get('q', '')
+        queryset = super().get_queryset().order_by('-timestamp')
+        return self.apply_filters(queryset)
+
+    def apply_filters(self, queryset):
+        query = self.request.GET.get('q', '').strip()
         if query:
             queryset = queryset.filter(
                 Q(description__icontains=query) |
@@ -25,6 +28,12 @@ class SystemLogListView(LoginRequiredMixin, PaginationMixin, ListView):
                 Q(user__username__icontains=query)
             )
         return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['q'] = self.request.GET.get('q', '')
+        context['per_page'] = self.request.GET.get('per_page', str(self.paginate_by))
+        return context
 
     def get(self, request, *args, **kwargs):
         if request.GET.get('export') == '1':

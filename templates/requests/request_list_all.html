@@ -8,7 +8,7 @@
 <div class="row">
     <form method="get" class="row g-3 mb-4">
     <div class="col-md-3">
-        <input type="text" name="name" value="{{ filters.name }}" class="form-control" placeholder="Име на клиент">
+        <input type="text" name="request_number" value="{{ filters.request_number }}" class="form-control" placeholder="Заявка №">
     </div>
     <div class="col-md-2">
         <input type="text" name="eik" value="{{ filters.eik }}" class="form-control" placeholder="ЕИК">
@@ -46,7 +46,7 @@
         <option value="rejected" {% if filters.status == "rejected" %}selected{% endif %}>Отказан</option>
     </select>
     </div>
-
+    <input type="hidden" name="per_page" value="{{ per_page }}">
     <div class="col-md-2">
         <button type="submit" class="btn btn-outline-primary w-100">🔍 Търси</button>
     </div>

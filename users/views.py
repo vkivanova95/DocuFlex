@@ -86,24 +86,27 @@ class UserListView(LoginRequiredMixin, GroupRequiredMixin, PaginationMixin, List
     template_name = 'users/user_list.html'
     context_object_name = 'users'
     allowed_groups = ['ръководител']
+    ordering = ['username']
 
     def get_queryset(self):
-        query = self.request.GET.get('search', '')
-        qs = super().get_queryset().prefetch_related('groups')
+        queryset = super().get_queryset().prefetch_related('groups')
+        return self.apply_filters(queryset)
 
+    def apply_filters(self, queryset):
+        query = self.request.GET.get('search', '').strip()
         if query:
-            qs = qs.filter(
+            queryset = queryset.filter(
                 Q(username__icontains=query) |
                 Q(first_name__icontains=query) |
                 Q(last_name__icontains=query) |
                 Q(groups__name__icontains=query)
             ).distinct()
-
-        return qs
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['search_query'] = self.request.GET.get('search', '')
+        context['per_page'] = self.request.GET.get('per_page', str(self.paginate_by))
         return context
 
 

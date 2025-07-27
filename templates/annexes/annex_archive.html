@@ -4,7 +4,7 @@
 {% block content %}
 <div class="card shadow-sm p-4">
   <div class="card shadow-sm p-4">
-    <h4 class="custom-header">Регистър на изготвените анекси</h4>
+    <h4 class="custom-header">Регистър на изготвените неподписани анекси</h4>
 
       {% include 'pagination_control.html' %}
 
@@ -12,7 +12,7 @@
       <input type="text" name="request_number" value="{{ filters.request_number }}" class="form-control w-auto" placeholder="Заявка №">
       <input type="text" name="eik" value="{{ filters.eik }}" class="form-control w-auto" placeholder="ЕИК">
       <input type="text" name="contract_number" value="{{ filters.contract_number }}" class="form-control w-auto" placeholder="Договор №">
-
+        <input type="hidden" name="per_page" value="{{ per_page }}">
       <button type="submit" class="btn btn-outline-primary">🔍 Търси</button>
       <a href="{% url 'annexes:annex_archive' %}" class="btn btn-outline-danger">✖ Изчисти</a>
     </form>

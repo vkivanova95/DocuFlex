@@ -2,7 +2,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.views import View
 from django.views.generic import ListView, UpdateView
 from .models import NewsPost
-from common.mixins import GroupRequiredMixin
+from common.mixins import GroupRequiredMixin, PaginationMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.edit import CreateView
 from django.urls import reverse_lazy
@@ -16,9 +16,20 @@ class PublicHomepageView(ListView):
     model = NewsPost
     template_name = 'news/welcome.html'
     context_object_name = 'news_posts'
+    ordering = ['-published_at']
 
     def get_queryset(self):
-        return NewsPost.objects.filter(is_active=True).order_by('-published_at')
+        queryset = super().get_queryset()
+        return self.apply_filters(queryset)
+
+    def apply_filters(self, queryset):
+        queryset = queryset.filter(is_active=True)
+
+        query = self.request.GET.get('q', '').strip()
+        if query:
+            queryset = queryset.filter(title__icontains=query)
+
+        return queryset
 
 
 class NewsPostCreateView(LoginRequiredMixin, GroupRequiredMixin, LogActionMixin, CreateView):
@@ -36,15 +47,28 @@ class NewsPostCreateView(LoginRequiredMixin, GroupRequiredMixin, LogActionMixin,
         return response
 
 
-class NewsPostListView(LoginRequiredMixin, GroupRequiredMixin, ListView):
+class NewsPostListView(LoginRequiredMixin, GroupRequiredMixin, PaginationMixin, ListView):
     model = NewsPost
     template_name = 'news/news_list.html'
     context_object_name = 'news_posts'
-    paginate_by = 10
     allowed_groups = ['ръководител']
+    ordering = ['-published_at']
 
     def get_queryset(self):
-        return NewsPost.objects.all().order_by('-published_at')
+        queryset = super().get_queryset()
+        return self.apply_filters(queryset)
+
+    def apply_filters(self, queryset):
+        query = self.request.GET.get('q', '').strip()
+        if query:
+            queryset = queryset.filter(title__icontains=query)
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['q'] = self.request.GET.get('q', '')
+        context['per_page'] = self.request.GET.get('per_page', str(self.paginate_by))
+        return context
 
 
 class NewsPostUpdateView(LoginRequiredMixin, GroupRequiredMixin, LogActionMixin, UpdateView):

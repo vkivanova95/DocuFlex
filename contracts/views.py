@@ -63,12 +63,15 @@ class ContractEikLookupView(LoginRequiredMixin, GroupRequiredMixin, FormView):
 
 
 class ContractSelectView(LoginRequiredMixin, GroupRequiredMixin, ListView):
+    model = Contract
     template_name = 'contracts/contract_select.html'
     context_object_name = 'contracts'
     allowed_groups = ['бизнес']
+    ordering = ('contract_number',)
 
     def get_queryset(self):
-        return Contract.objects.filter(client__eik=self.kwargs['eik'], is_active=True)
+        queryset = super().get_queryset().filter(is_active=True, client__eik=self.kwargs['eik'])
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -100,9 +103,10 @@ class ContractListView(LoginRequiredMixin, GroupRequiredMixin, PaginationMixin, 
     template_name = 'contracts/contract_list.html'
     context_object_name = 'contracts'
     allowed_groups = ['бизнес', 'ръководител', 'изпълнител']
+    ordering = ['contract_number']
 
     def get_queryset(self):
-        queryset = Contract.objects.select_related('client')
+        queryset = super().get_queryset().select_related('client')
         return self.apply_filters(queryset)
 
     def apply_filters(self, queryset):
@@ -119,6 +123,12 @@ class ContractListView(LoginRequiredMixin, GroupRequiredMixin, PaginationMixin, 
             queryset = queryset.filter(is_active=(status == 'active'))
 
         return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['search_query'] = self.request.GET.get('search', '')
+        context['per_page'] = self.request.GET.get('per_page', str(self.paginate_by))
+        return context
 
 
 class ContractDeactivateView(LoginRequiredMixin, GroupRequiredMixin, View):

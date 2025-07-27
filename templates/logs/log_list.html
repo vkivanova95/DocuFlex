@@ -6,17 +6,17 @@
     {% include 'pagination_control.html' %}
 
     <form method="get" class="input-group mb-4">
-        <input type="text" name="q" class="form-control" placeholder="Търси по потребител, действие, модул и/или описание..." value="{{ query }}">
+        <input type="text" name="q" class="form-control w-50" placeholder="Търси по потребител, действие, модул или описание" value="{{ query }}">
+        <input type="hidden" name="per_page" value="{{ per_page }}">
         <button type="submit" class="btn btn-outline-primary me-2">🔍 Търси</button>
-        <a href="{% url 'logs:log-list' %}" class="btn btn-outline-danger me-2">✖ Изчисти</a>
+        <a href="{% url 'logs:log-list' %}" class="btn btn-outline-danger">✖ Изчисти</a>
         <a href="?q={{ request.GET.q }}&export=1" class="btn btn-outline-success ms-2">📤 Excel</a>
-
     </form>
 
 <table class="table table-striped">
 <thead>
   <tr>
-    <th>Дата/Час</th><th>Потребител</th><th>Действие</th><th>Модул</th><th>No</th><th>Описание</th>
+    <th>Дата/Час</th><th>Потребител</th><th>Действие</th><th>Модул</th><th>Описание</th>
   </tr>
 </thead>
 
@@ -27,7 +27,6 @@
     <td>{{ log.user }}</td>
     <td>{{ log.get_action_display }}</td>
     <td>{{ log.model_name }}</td>
-    <td>{{ log.object_id }}</td>
     <td>{{ log.description }}</td>
   </tr>
   {% endfor %}

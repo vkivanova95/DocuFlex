@@ -1,22 +1,22 @@
 {% extends 'base.html' %}
 {% block content %}
+
+{% load group_tags %}
 <div class="container mt-4">
     <h4 class="custom-header mb-4">Номенклатура валути</h4>
 
     <div class="text-start">
         <a href="{% url 'nomenclatures:nomenclature_list' %}" class="btn btn-outline-primary mb-2">⬅️ Назад</a>
     </div>
+{% include 'pagination_control.html' %}
 <p>
 
 </p>
      <form method="get" class="input-group mb-4">
-        <input type="text" name="q" class="form-control" placeholder="Търси..." value="{{ query }}">
-
-        {% if query %}
-            <a href="{% url 'nomenclatures:currency_list' %}" class="btn btn-outline-danger">✖ Изчисти</a>
-        {% else %}
-            <button type="submit" class="btn btn-outline-primary">🔍 Търси</button>
-        {% endif %}
+        <input type="text" name="q" class="form-control" placeholder="Търси по име или код валута" value="{{ query }}">
+        <input type="hidden" name="per_page" value="{{ per_page }}">
+        <button type="submit" class="btn btn-outline-primary me-2">🔍 Търси</button>
+        <a href="{% url 'nomenclatures:currency_list' %}" class="btn btn-outline-danger">❌ Изчисти</a>
     </form>
 
     <ul class="list-group">
@@ -35,5 +35,7 @@
             <li class="list-group-item">Няма въведени валути.</li>
         {% endfor %}
     </ul>
+
 </div>
+    {% include "pagination.html" with page_obj=page_obj %}
 {% endblock %}

@@ -8,11 +8,11 @@
 
     {% include 'pagination_control.html' %}
 
-    <form method="get" class="mb-3 d-flex justify-content-end">
+    <form method="get" class="mb-3 d-flex justify-content-end align-items-center">
         <input type="text" name="search" value="{{ search_query }}" class="form-control me-2" placeholder="Търси по ЕИК или Номер на договор">
-        <button type="submit" class="btn btn-primary me-2 d-flex align-items-center">
-            <span class="me-1">🔍</span> Търси
-        </button>
+        <input type="hidden" name="per_page" value="{{ per_page }}">
+        <button type="submit" class="btn btn-outline-primary me-2" style="min-width: 120px;">🔍 Търси</button>
+        <a href="{% url 'contracts:list' %}" class="btn btn-outline-danger" style="min-width: 120px;">✖ Изчисти</a>
     </form>
 
 <table class="table table-striped">

@@ -78,27 +78,35 @@ class ClientListView(LoginRequiredMixin, GroupRequiredMixin, PaginationMixin, Li
     template_name = 'clients/client_list.html'
     context_object_name = 'clients'
     allowed_groups = ['бизнес', 'ръководител', 'изпълнител']
+    ordering = ['name']
+
 
     def get_queryset(self):
-        queryset = Client.objects.all().order_by('name')
-        search_query = self.request.GET.get('search', '').strip()
+        queryset = super().get_queryset()
+        return self.apply_filters(queryset)
 
-        if search_query:
+    def apply_filters(self, queryset):
+        search = self.request.GET.get('search', '').strip()
+        status = self.request.GET.get('status')
+
+        if search:
             queryset = queryset.filter(
-                Q(name__icontains=search_query) | Q(eik__icontains=search_query)
+                Q(name__icontains=search) |
+                Q(eik__icontains=search)
             )
 
-        status_filter = self.request.GET.get('status')
-        if status_filter == 'active':
+        if status == 'active':
             queryset = queryset.filter(is_active=True)
-        elif status_filter == 'inactive':
+        elif status == 'inactive':
             queryset = queryset.filter(is_active=False)
 
-        return queryset.order_by('name')
+        return queryset
+
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['search_query'] = self.request.GET.get('search', '')
+        context['per_page'] = self.request.GET.get('per_page', str(self.paginate_by))
         return context
 
 
