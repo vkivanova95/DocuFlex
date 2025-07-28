@@ -47,20 +47,20 @@
 
 ```
 docuflex/
-  |--- DocuFlex/		    # Django core settings and URLs
-  |--- common/              # Shared mixins, utils, context processors
-  |--- clients/          	# Manage corporate clients (with unique identifiers like company ID)
-  |--- contracts/           # Manage loan contracts related to clients
-  |--- loan_requests/       # Create and assign requests for drafting annexes tied to contracts
-  |--- annexes/             # Generate annex files and track e-signature status
-  |--- reports/             # Productivity analytics and document signing records
-  |--- api/ 			    # REST endpoints for asynchronous communication and integration
-  |--- logs/			    # System-wide logging of users actions
-  |--- news/			    # Internal announcements and notifications
-  |--- users/               # Custom user model, registration, roles, and permissions
-  |--- nomenclatures/		# Reference tables (currencies, annex types, etc.)
-  |--- templates/           # HTML templates (Bootstrap 5)
-  |--- static/              # CSS 
+  |--- DocuFlex/           # Django core settings and URLs
+  |--- common/             # Shared mixins, utils, context processors
+  |--- clients/            # Manage corporate clients (with unique identifiers like company ID)
+  |--- contracts/          # Manage loan contracts related to clients
+  |--- loan_requests/      # Create and assign requests for drafting annexes tied to contracts
+  |--- annexes/            # Generate annex files and track e-signature status
+  |--- reports/            # Productivity analytics and document signing records
+  |--- api/                # REST endpoints for asynchronous communication and integration
+  |--- logs/               # System-wide logging of users actions
+  |--- news/               # Internal announcements and notifications
+  |--- users/              # Custom user model, registration, roles, and permissions
+  |--- nomenclatures/      # Reference tables (currencies, annex types, etc.)
+  |--- templates/          # HTML templates (Bootstrap 5)
+  |--- static/             # CSS 
 
 ```
 ---
@@ -70,7 +70,7 @@ docuflex/
 Below is a simplified diagram showing the most important relationships between models:
 
 
-Client  ───▶  Contract (FK: client)  ───▶  Request (FK: contract)  ───▶  GeneratedAnnex (FK: request) ───▶ SignStatus (signed, failed, pending)
+Client  --->  Contract (FK: client)  --->   Request (FK: contract)  --->   GeneratedAnnex (FK: request) --->  SignStatus (signed, failed, pending)
 
 
 ### 🧩 Entity-Relationship Overview
