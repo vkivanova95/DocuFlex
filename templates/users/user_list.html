@@ -10,7 +10,7 @@
     </div>
 
     <form method="get" class="mb-3 d-flex flex-wrap align-items-center gap-2" role="search">
-        <input type="text" name="search" value="{{ search_query }}" class="form-control" placeholder="Търси по потребител, име или група" style="max-width: 300px;">
+        <input type="text" name="q" value="{{ q }}" class="form-control" placeholder="Търси по потребител, име или група" style="max-width: 300px;">
         <input type="hidden" name="per_page" value="{{ per_page }}">
         <button type="submit" class="btn btn-outline-primary">🔍 Търси</button>
         <a href="{% url 'users:user-list' %}" class="btn btn-outline-danger">✖ Изчисти</a>

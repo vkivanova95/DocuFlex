@@ -1,4 +1,5 @@
-from common.mixins import GroupRequiredMixin, PaginationMixin
+from common.constants import GROUP_BUSINESS, GROUP_MANAGER, GROUP_MAKER
+from common.mixins import GroupRequiredMixin, PaginationMixin, ContextQueryMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.db.models import Q
@@ -15,13 +16,15 @@ from clients.forms import EIKLookupForm
 from logs.mixins import LogActionMixin
 
 
-class ContractCreateView(LoginRequiredMixin, GroupRequiredMixin, LogActionMixin, CreateView):
+class ContractCreateView(
+    LoginRequiredMixin, GroupRequiredMixin, LogActionMixin, CreateView
+):
     model = Contract
     form_class = ContractForm
-    template_name = 'contracts/contract_form.html'
-    success_url = reverse_lazy('contracts:create')
-    allowed_groups = ['бизнес']
-    action_type = 'create'
+    template_name = "contracts/contract_form.html"
+    success_url = reverse_lazy("contracts:create")
+    allowed_groups = [GROUP_BUSINESS]
+    action_type = "create"
 
     def form_valid(self, form):
         messages.success(self.request, "Договорът беше успешно записан.")
@@ -29,110 +32,121 @@ class ContractCreateView(LoginRequiredMixin, GroupRequiredMixin, LogActionMixin,
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
-        if 'client' in form.fields:
-            form.fields['client'].disabled = True
+        if "client" in form.fields:
+            form.fields["client"].disabled = True
         return form
 
     def get_initial(self):
         initial = super().get_initial()
-        client_id = self.request.GET.get('client_id')
+        client_id = self.request.GET.get("client_id")
         if client_id:
-            initial['client_id'] = client_id
+            initial["client_id"] = client_id
         return initial
 
 
 class GetClientNameView(LoginRequiredMixin, GroupRequiredMixin, View):
-    allowed_groups = ['бизнес']
+    allowed_groups = [GROUP_BUSINESS]
+
     def get(self, request):
         eik = request.GET.get("eik")
+        if not eik:
+            return JsonResponse({"status": "not_found"}, status=400)
+
         try:
-            client = Client.objects.get(eik=eik, is_active=True)
-            return JsonResponse({"name": client.name})
+            client = Client.objects.get(eik=eik)
+            if client.is_active:
+                return JsonResponse({"name": client.name, "status": "active"})
+            else:
+                return JsonResponse({"status": "inactive"})
         except Client.DoesNotExist:
-            return JsonResponse({'error': 'Клиентът не е намерен.'}, status=404)
+            return JsonResponse({"status": "not_found"})
 
 
 class ContractEikLookupView(LoginRequiredMixin, GroupRequiredMixin, FormView):
-    template_name = 'contracts/contract_eik_lookup.html'
+    template_name = "contracts/contract_eik_lookup.html"
     form_class = EIKLookupForm
-    allowed_groups = ['бизнес']
+    allowed_groups = [GROUP_BUSINESS]
 
     def form_valid(self, form):
-        eik = form.cleaned_data['eik']
-        return redirect('contracts:contract_select', eik=eik)
+        eik = form.cleaned_data["eik"]
+        return redirect("contracts:contract_select", eik=eik)
 
 
 class ContractSelectView(LoginRequiredMixin, GroupRequiredMixin, ListView):
     model = Contract
-    template_name = 'contracts/contract_select.html'
-    context_object_name = 'contracts'
-    allowed_groups = ['бизнес']
-    ordering = ('contract_number',)
+    template_name = "contracts/contract_select.html"
+    context_object_name = "contracts"
+    allowed_groups = [GROUP_BUSINESS]
+    ordering = ("contract_number",)
 
     def get_queryset(self):
-        queryset = super().get_queryset().filter(is_active=True, client__eik=self.kwargs['eik'])
+        queryset = (
+            super()
+            .get_queryset()
+            .filter(is_active=True, client__eik=self.kwargs["eik"])
+        )
         return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['client'] = get_object_or_404(Client, eik=self.kwargs['eik'])
+        context["client"] = get_object_or_404(Client, eik=self.kwargs["eik"])
         return context
 
 
-class ContractUpdateView(LoginRequiredMixin, GroupRequiredMixin, SuccessMessageMixin, LogActionMixin, UpdateView):
+class ContractUpdateView(
+    LoginRequiredMixin,
+    GroupRequiredMixin,
+    SuccessMessageMixin,
+    LogActionMixin,
+    UpdateView,
+):
     model = Contract
     form_class = ContractForm
-    template_name = 'contracts/contract_form.html'
-    success_url = reverse_lazy('home')
+    template_name = "contracts/contract_form.html"
+    success_url = reverse_lazy("contracts:list")
     success_message = "Данните бяха успешно редактирани."
-    allowed_groups = ['бизнес']
-    action_type = 'edit'
+    allowed_groups = [GROUP_BUSINESS]
+    action_type = "edit"
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
-        form.fields['contract_number'].disabled = True
-        form.fields['eik'].disabled = True
+        form.fields["contract_number"].disabled = True
+        form.fields["eik"].disabled = True
         return form
 
     def form_valid(self, form):
         return super().form_valid(form)
 
 
-class ContractListView(LoginRequiredMixin, GroupRequiredMixin, PaginationMixin, ListView):
+class ContractListView(
+    LoginRequiredMixin, GroupRequiredMixin, PaginationMixin, ContextQueryMixin, ListView
+):
     model = Contract
-    template_name = 'contracts/contract_list.html'
-    context_object_name = 'contracts'
-    allowed_groups = ['бизнес', 'ръководител', 'изпълнител']
-    ordering = ['contract_number']
+    template_name = "contracts/contract_list.html"
+    context_object_name = "contracts"
+    allowed_groups = [GROUP_BUSINESS, GROUP_MANAGER, GROUP_MAKER]
+    ordering = ["contract_number"]
 
     def get_queryset(self):
-        queryset = super().get_queryset().select_related('client')
+        queryset = super().get_queryset().select_related("client")
         return self.apply_filters(queryset)
 
     def apply_filters(self, queryset):
-        search = self.request.GET.get('search', '')
-        status = self.request.GET.get('status', '')
+        query = self.request.GET.get("q", "")
+        status = self.request.GET.get("status", "")
 
-        if search:
+        if query:
             queryset = queryset.filter(
-                Q(contract_number__icontains=search) |
-                Q(client__eik__icontains=search)
+                Q(contract_number__icontains=query) | Q(client__eik__icontains=query)
             )
-
-        if status in ['active', 'inactive']:
-            queryset = queryset.filter(is_active=(status == 'active'))
+        if status in ["active", "inactive"]:
+            queryset = queryset.filter(is_active=(status == "active"))
 
         return queryset
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['search_query'] = self.request.GET.get('search', '')
-        context['per_page'] = self.request.GET.get('per_page', str(self.paginate_by))
-        return context
-
 
 class ContractDeactivateView(LoginRequiredMixin, GroupRequiredMixin, View):
-    allowed_groups = ['бизнес']
+    allowed_groups = [GROUP_BUSINESS]
 
     def post(self, request, pk):
         try:

@@ -17,7 +17,9 @@ class ClientDeactivationPropagationTest(TestCase):
 
     def setUp(self):
         # Създаваме валутата, ако е нужна за contract
-        self.currency = Currency.objects.create(currency_code='EUR', currency_name='Euro')
+        self.currency = Currency.objects.create(
+            currency_code="EUR", currency_name="Euro"
+        )
 
     def test_deactivation_propagates(self):
         # Създаване на активен клиент
@@ -37,7 +39,7 @@ class ClientDeactivationPropagationTest(TestCase):
         request = Request.objects.create(
             client=client,
             loan_agreement=contract,
-            status='В процес на работа',
+            status="В процес на работа",
             amount=5000,
             currency=self.currency,
         )
@@ -50,5 +52,11 @@ class ClientDeactivationPropagationTest(TestCase):
         contract.refresh_from_db()
         request.refresh_from_db()
 
-        self.assertFalse(contract.is_active, "Договорът трябва да е неактивен след деактивиране на клиента.")
-        self.assertFalse(request.is_active, "Заявката трябва да е неактивна след деактивиране на клиента.")
+        self.assertFalse(
+            contract.is_active,
+            "Договорът трябва да е неактивен след деактивиране на клиента.",
+        )
+        self.assertFalse(
+            request.is_active,
+            "Заявката трябва да е неактивна след деактивиране на клиента.",
+        )

@@ -7,23 +7,23 @@
 
 ## 🚀 Key Features
 
-* 🔐 Role-based Access Control (business users, executors/makers, managers, and admin).
+* **Role-based Access Control** (business users, executors/makers, managers, and admin).
 
-* 👤 Client & Contract Management with activation/deactivation and validation rules.
+* **Client & Contract Management** with activation/deactivation and validation rules.
 
-* 🧾 Requests Workflow – creation, assignment, processing.
+* **Requests Workflow** – creation, assignment, processing.
 
-* 📄 Annex Generator – dynamically generates `.docx` annexes from input data using reusable templates and conditional sections.
+* **Annex Generator** – dynamically generates `.docx` annexes from input data using reusable templates and conditional sections.
 
-* ✅ E-signature integration (mock asynchronous API).
+* **E-signature integration** (mock asynchronous API).
 
-* 🗂️ Annex Archive – filtering, search, pagination, and Excel export.
+* **Annex Archive** – filtering, search, pagination, and Excel export.
 
-* 📊 Reports/ Log – track user productivity, document signing history, and system activity.
+* **Reports/ Log** – track user productivity, document signing history, and system activity.
 
-* 🛠️ Nomenclatures – centralized reference data.
+* **Nomenclatures** – centralized reference data.
 
-* 💬 News modules – internal communication
+* **News modules** – internal communication
 
 ---
 ## 🧩 Tech Highlights

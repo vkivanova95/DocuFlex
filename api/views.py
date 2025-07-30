@@ -20,83 +20,117 @@ class MockSignAnnexView(APIView):
     def post(self, request, *args, **kwargs):
         # симулиране случайно подписване
         success = random.choice([True, False])
-        annex_number = request.data.get('annex_number', 'unknown')
+        annex_number = request.data.get("annex_number", "unknown")
 
         if success:
-            return Response({
-                'status': 'success',
-                'message': f'Анекс {annex_number} е подписан успешно.'
-            })
+            return Response(
+                {
+                    "status": "success",
+                    "message": f"Анекс {annex_number} е подписан успешно.",
+                }
+            )
         else:
-            return Response({
-                'status': 'failure',
-                'message': f'Анекс {annex_number} не е подписан!'
-            }, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {
+                    "status": "failure",
+                    "message": f"Анекс {annex_number} не е подписан!",
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
 
-@method_decorator(login_required, name='dispatch')
+@method_decorator(login_required, name="dispatch")
 class SendGeneratedAnnexView(View):
     async def get(self, request, pk):
-        annex = await sync_to_async(GeneratedAnnex.objects.select_related('request').get)(pk=pk)
+        def get_annex_and_check_permission():
+            annex = GeneratedAnnex.objects.select_related("request").get(pk=pk)
+            if annex.request.maker != request.user and not request.user.is_superuser:
+                return annex, False
+            return annex, True
+
+        annex, has_permission = await sync_to_async(get_annex_and_check_permission)()
+
+        if not has_permission:
+            return await sync_to_async(render)(
+                request,
+                "api/send_result.html",
+                {
+                    "status": "error",
+                    "message": "Нямате права да изпратите този анекс за подписване.",
+                },
+            )
 
         # Проверка дали вече има успешно подписване
-        latest_log = await sync_to_async(SignatureLog.objects.filter(
-            annex_number=annex.annex_number,
-            request=annex.request,
-            is_signed_successfully=True
-        ).order_by('-sent_at').first)()
+        latest_log = await sync_to_async(
+            SignatureLog.objects.filter(
+                annex_number=annex.annex_number,
+                request=annex.request,
+                is_signed_successfully=True,
+            )
+            .order_by("-sent_at")
+            .first
+        )()
 
         if latest_log:
-            return await sync_to_async(render)(request, 'api/send_result.html', {
-                'status': 'info',
-                'message': f'Анекс №{annex.annex_number} по заявка №{annex.request.request_number} вече е подписан успешно и не може да бъде изпращан повторно.'
-            })
+            return await sync_to_async(render)(
+                request,
+                "api/send_result.html",
+                {
+                    "status": "info",
+                    "message": f"Анекс №{annex.annex_number} по заявка №{annex.request.request_number} вече е подписан успешно и не може да бъде изпращан повторно.",
+                },
+            )
 
         # Ако неуспешен или няма лог – иска потвърждение
-        if annex.is_sent and not request.GET.get('confirm'):
-            return await sync_to_async(render)(request, 'api/confirm_resend.html', {
-                'annex': annex,
-                'sent_at': annex.sent_at,
-                'send_attempts': annex.send_attempts,
-            })
+        if annex.is_sent and not request.GET.get("confirm"):
+            return await sync_to_async(render)(
+                request,
+                "api/confirm_resend.html",
+                {
+                    "annex": annex,
+                    "sent_at": annex.sent_at,
+                    "send_attempts": annex.send_attempts,
+                },
+            )
 
         # зареждане и изпращане на файла
         file_path = os.path.join(settings.MEDIA_ROOT, annex.file_path.name)
         try:
-            with open(file_path, 'rb') as f:
+            with open(file_path, "rb") as f:
                 file_bytes = await sync_to_async(f.read)()
-            file_content = base64.b64encode(file_bytes).decode('utf-8')
+            file_content = base64.b64encode(file_bytes).decode("utf-8")
         except FileNotFoundError:
-            return await sync_to_async(render)(request, 'api/send_result.html', {
-                'status': 'error',
-                'message': 'Файлът не е намерен.'
-            })
+            return await sync_to_async(render)(
+                request,
+                "api/send_result.html",
+                {"status": "error", "message": "Файлът не е намерен."},
+            )
 
         payload = {
-            'annex_number': annex.annex_number,
-            'file_base64': file_content,
+            "annex_number": annex.annex_number,
+            "file_base64": file_content,
         }
 
         try:
             async with httpx.AsyncClient() as client:
-                response = await client.post('http://localhost:8000/api/mock-sign/', json=payload)
+                response = await client.post(settings.SIGNING_API_URL, json=payload)
                 data = response.json()
-                status_result = data.get('status')
-                message = data.get('message')
-                is_success = status_result == 'success'
+                status_result = data.get("status")
+                message = data.get("message")
+                is_success = status_result == "success"
 
                 # Промяна на статус на заявката, ако е успешно
-                if is_success and annex.request.status != 'Подписан':
+                if is_success and annex.request.status != "Подписан":
                     req = annex.request
-                    req.status = 'Подписана'
+                    req.status = "Подписана"
 
                     req = annex.request
-                    req.status = 'Подписан'
+                    req.status = "Подписан"
                     req.signing_date = now()
                     await sync_to_async(req.save)()
 
         except Exception as e:
-            status_result = 'error'
+            status_result = "error"
             message = str(e)
             is_success = False
 
@@ -108,7 +142,7 @@ class SendGeneratedAnnexView(View):
             status=status_result,
             response_message=message,
             is_signed_successfully=is_success,
-            request=annex.request
+            request=annex.request,
         )
 
         # Обновяване на `GeneratedAnnex`
@@ -121,15 +155,13 @@ class SendGeneratedAnnexView(View):
         await sync_to_async(SystemLog.objects.create)(
             user=request.user,
             action=ActionType.CREATE,
-            model_name='AnnexSignature',
+            model_name="AnnexSignature",
             object_id=annex.annex_number,
-            description=f"Подписване: {status_result.upper()} – {message}"
+            description=f"Подписване: {status_result.upper()} – {message}",
         )
 
-        return await sync_to_async(render)(request, 'api/send_result.html', {
-            'status': status_result,
-            'message': message
-        })
-
-
-
+        return await sync_to_async(render)(
+            request,
+            "api/send_result.html",
+            {"status": status_result, "message": message},
+        )
