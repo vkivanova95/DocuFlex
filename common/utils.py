@@ -3,13 +3,10 @@ from io import BytesIO
 from django.http import HttpResponse
 
 
-def has_group(user, group_name):
-    return user.groups.filter(name=group_name).exists()
-
-def export_report_to_excel(headers, rows, filename='report'):
+def export_report_to_excel(headers, rows, filename="report"):
     wb = Workbook()
     ws = wb.active
-    ws.title = 'Справка'
+    ws.title = "Справка"
 
     ws.append(headers)
 
@@ -22,7 +19,7 @@ def export_report_to_excel(headers, rows, filename='report'):
 
     response = HttpResponse(
         output.read(),
-        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     )
-    response['Content-Disposition'] = f'attachment; filename="{filename}.xlsx"'
+    response["Content-Disposition"] = f'attachment; filename="{filename}.xlsx"'
     return response

@@ -1,5 +1,6 @@
 from logs.signals import log_action
 
+
 class LogActionMixin:
     action_type = None
 

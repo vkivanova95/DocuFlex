@@ -1,11 +1,21 @@
 {% extends 'base.html' %}
+{% load query_transform %}
+
 {% block content %}
 <div class="container">
     <h4 class="mb-4">Регистър подписани анекси</h4>
 
-    <div class="d-flex justify-content-end mb-3">
-        <a href="?export=excel" class="btn btn-outline-success">📤 Excel</a>
-    </div>
+    <form method="get" class="row g-2 align-items-center mb-3">
+        <div class="col-md-5">
+            <input type="text" name="q" class="form-control" placeholder="Търси по номер заявка, ЕИК, клиент, договор или изпълнител" value="{{ filters.q }}">
+        </div>
+        <div class="col-md-4 d-flex align-items-end justify-content-end">
+            <button type="submit" class="btn btn-outline-primary me-2">🔍 Търси</button>
+            <a href="{% url 'reports:annex_status_report' %}" class="btn btn-outline-danger me-2">✖ Изчисти</a>
+            <a href="?{% query_transform request export='excel' %}" class="btn btn-outline-success me-2">📤 Excel</a>
+        </div>
+    </form>
+
     <div class="table-responsive">
         <table class="table table-striped table-sm">
             <thead>

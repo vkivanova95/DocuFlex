@@ -45,7 +45,7 @@
                     <a href="{% url 'news:edit_news' post.pk %}" class="btn btn-sm btn-outline-primary">✏️ Редакция</a>
                     <form method="post" action="{% url 'news:deactivate_news' post.pk %}" style="display:inline;">
                         {% csrf_token %}
-                        <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Да деактивираме ли тази новина?')">🗑️ Деактивация</button>
+                        <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Наистина ли искате да деактивирате тази новина?')">🗑️ Деактивация</button>
                     </form>
                 </td>
             </tr>

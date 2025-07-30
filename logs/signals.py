@@ -12,5 +12,5 @@ def log_action(user, action, instance):
         model_name=model_name,
         object_id=object_id,
         description=description,
-        timestamp=now()
+        timestamp=now(),
     )

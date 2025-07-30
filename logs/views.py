@@ -1,56 +1,56 @@
 from django.utils.timezone import localtime
 from django.views.generic import ListView
 
-from common.mixins import PaginationMixin
+from common.mixins import PaginationMixin, FilterQuerysetMixin, ContextQueryMixin
 from .models import SystemLog
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 from common.utils import export_report_to_excel
 
 
-class SystemLogListView(LoginRequiredMixin, PaginationMixin, ListView):
+class SystemLogListView(
+    LoginRequiredMixin,
+    PaginationMixin,
+    FilterQuerysetMixin,
+    ContextQueryMixin,
+    ListView,
+):
     model = SystemLog
-    template_name = 'logs/log_list.html'
-    context_object_name = 'logs'
-    ordering = ['-timestamp']
-
-    def get_queryset(self):
-        queryset = super().get_queryset().order_by('-timestamp')
-        return self.apply_filters(queryset)
+    template_name = "logs/log_list.html"
+    context_object_name = "logs"
+    ordering = ["-timestamp"]
 
     def apply_filters(self, queryset):
-        query = self.request.GET.get('q', '').strip()
+        query = self.request.GET.get("q", "").strip()
         if query:
             queryset = queryset.filter(
-                Q(description__icontains=query) |
-                Q(model_name__icontains=query) |
-                Q(action__icontains=query) |
-                Q(user__username__icontains=query)
+                Q(description__icontains=query)
+                | Q(model_name__icontains=query)
+                | Q(action__icontains=query)
+                | Q(user__username__icontains=query)
             )
         return queryset
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['q'] = self.request.GET.get('q', '')
-        context['per_page'] = self.request.GET.get('per_page', str(self.paginate_by))
-        return context
-
     def get(self, request, *args, **kwargs):
-        if request.GET.get('export') == '1':
+        if request.GET.get("export") == "1":
             queryset = self.get_queryset()
 
-            headers = ['Дата/Час', 'Потребител', 'Действие', 'Модул', 'No', 'Описание']
+            headers = ["Дата/Час", "Потребител", "Действие", "Модул", "No", "Описание"]
             rows = [
                 [
-                    localtime(log.timestamp).strftime("%Y-%m-%d %H:%M:%S") if log.timestamp else '',
-                    log.user.username if log.user else '',
+                    (
+                        localtime(log.timestamp).strftime("%Y-%m-%d %H:%M:%S")
+                        if log.timestamp
+                        else ""
+                    ),
+                    log.user.username if log.user else "",
                     log.action,
                     log.model_name,
-                    log.object_id if log.object_id else '',
-                    log.description
+                    log.object_id if log.object_id else "",
+                    log.description,
                 ]
                 for log in queryset
             ]
-            return export_report_to_excel(headers, rows, filename='system_log_report')
+            return export_report_to_excel(headers, rows, filename="system_log_report")
 
         return super().get(request, *args, **kwargs)

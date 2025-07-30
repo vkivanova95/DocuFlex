@@ -1,3 +1,6 @@
+from django.db.models import Q
+
+from common.constants import GROUP_MAKER
 from common.mixins import GroupRequiredMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views import View
@@ -6,20 +9,19 @@ from django.contrib.auth import get_user_model
 from loan_requests.models import Request
 from annexes.models import GeneratedAnnex
 from dateutil import parser
-from django.utils.timezone import localtime
 from common.utils import export_report_to_excel
 
 
 class ProductivityReportView(LoginRequiredMixin, GroupRequiredMixin, View):
-    template_name = 'reports/productivity_report.html'
-    allowed_groups = ['ръководител']
+    template_name = "reports/productivity_report.html"
+    allowed_groups = ["ръководител"]
 
     def get(self, request):
-        start_date = request.GET.get('start_date')
-        end_date = request.GET.get('end_date')
+        start_date = request.GET.get("start_date")
+        end_date = request.GET.get("end_date")
 
         User = get_user_model()
-        executors = User.objects.filter(groups__name='изпълнител', is_active=True)
+        executors = User.objects.filter(groups__name=GROUP_MAKER, is_active=True)
 
         try:
             start = parser.parse(start_date).date() if start_date else None
@@ -39,35 +41,72 @@ class ProductivityReportView(LoginRequiredMixin, GroupRequiredMixin, View):
             user_requests = requests_qs.filter(maker=user)
             user_annexes = annexes_qs.filter(request__maker=user)
 
-            report_data.append({
-                'user': user.get_full_name() or user.username,
-                'requests': user_requests.count(),
-                'annexes': user_annexes.count(),
-                'standard': user_annexes.filter(request__document_type='standard').count(),
-                'deletion': user_annexes.filter(request__document_type='deletion').count(),
-            })
+            report_data.append(
+                {
+                    "user": user.get_full_name() or user.username,
+                    "requests": user_requests.count(),
+                    "annexes": user_annexes.count(),
+                    "standard": user_annexes.filter(
+                        request__document_type="standard"
+                    ).count(),
+                    "deletion": user_annexes.filter(
+                        request__document_type="deletion"
+                    ).count(),
+                }
+            )
 
         if request.GET.get("export") == "1":
-            headers = ['Изпълнител', 'Брой заявки', 'Брой анекси', 'Стандартен анекс', 'Анекс за заличаване']
-            rows = [[row['user'], row['requests'], row['annexes'], row['standard'], row['deletion']] for row in report_data]
+            headers = [
+                "Изпълнител",
+                "Брой заявки",
+                "Брой анекси",
+                "Стандартен анекс",
+                "Анекс за заличаване",
+            ]
+            rows = [
+                [
+                    row["user"],
+                    row["requests"],
+                    row["annexes"],
+                    row["standard"],
+                    row["deletion"],
+                ]
+                for row in report_data
+            ]
             filename = f"productivity_report_{start_date}_to_{end_date}"
             return export_report_to_excel(headers, rows, filename)
 
-        return render(request, self.template_name, {
-            'report_data': report_data if start_date and end_date else [],
-            'start_date': start,
-            'end_date': end,
-        })
+        return render(
+            request,
+            self.template_name,
+            {
+                "report_data": report_data if start_date and end_date else [],
+                "start_date": start,
+                "end_date": end,
+            },
+        )
 
 
 class AnnexStatusReportView(LoginRequiredMixin, GroupRequiredMixin, View):
-    allowed_groups = ['ръководител', 'изпълнител', 'бизнес']
+    allowed_groups = ['ръководител']
 
     def get(self, request):
         export = request.GET.get('export')
+        query = self.request.GET.get('q', '').strip()
+
         queryset = GeneratedAnnex.objects.select_related(
             'request__client', 'request__loan_agreement', 'request__maker'
         )
+
+        if query:
+            queryset = queryset.filter(
+                Q(request__request_number__icontains=query) |
+                Q(request__loan_agreement__contract_number__icontains=query) |
+                Q(request__client__eik__icontains=query) |
+                Q(request__client__name__icontains=query) |
+                Q(request__maker__first_name__icontains=query) |
+                Q(request__maker__last_name__icontains=query)
+            )
 
         data = []
         for annex in queryset:
@@ -78,7 +117,6 @@ class AnnexStatusReportView(LoginRequiredMixin, GroupRequiredMixin, View):
 
             data.append({
                 "Номер на заявка": req.request_number,
-                # "Дата на заявка": localtime(req.created_at).strftime("%Y-%m-%d %H:%M:%S") if req.created_at else '',
                 "Номер на договор": contract.contract_number if contract else '',
                 "Номер на анекс": annex.annex_number,
                 "Име на клиент": client.name if client else '',
@@ -96,3 +134,4 @@ class AnnexStatusReportView(LoginRequiredMixin, GroupRequiredMixin, View):
             return export_report_to_excel(headers, rows, 'annex_status_report')
 
         return render(request, 'reports/annex_status_report.html', {'report_data': data})
+

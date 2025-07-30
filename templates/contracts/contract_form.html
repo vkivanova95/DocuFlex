@@ -99,25 +99,35 @@
 
   if (eikField && nameField) {
     eikField.addEventListener('change', function () {
-      const eik = eikField.value;
+      const eik = eikField.value.trim();
+
+      if (!eik) {
+        nameField.value = '';
+        return;
+      }
 
       fetch(`/contracts/get-client-name/?eik=${eik}`)
         .then(response => {
-          if (!response.ok) throw new Error();
+          if (!response.ok) throw new Error('Network error');
           return response.json();
         })
         .then(data => {
-          if (data.name) {
+          if (data.status === 'active' && data.name) {
             nameField.value = data.name;
-          } else {
+          } else if (data.status === 'inactive') {
+            nameField.value = 'Клиентът не е активен';
+          } else if (data.status === 'not_found') {
             nameField.value = 'Клиентът не е намерен';
+          } else {
+            nameField.value = 'Грешка при обработката на данните';
           }
         })
         .catch(() => {
-          nameField.value = 'Грешка при зареждане';
+          nameField.value = 'Грешка при заявката';
         });
     });
   }
 </script>
+
 
 {% endblock %}
