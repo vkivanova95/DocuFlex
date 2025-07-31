@@ -88,25 +88,27 @@ class ProductivityReportView(LoginRequiredMixin, GroupRequiredMixin, View):
 
 
 class AnnexStatusReportView(LoginRequiredMixin, GroupRequiredMixin, View):
-    allowed_groups = ['ръководител']
+    allowed_groups = ["ръководител"]
 
     def get(self, request):
-        export = request.GET.get('export')
-        query = self.request.GET.get('q', '').strip()
+        export = request.GET.get("export")
+        query = self.request.GET.get("q", "").strip()
 
         queryset = GeneratedAnnex.objects.select_related(
-            'request__client', 'request__loan_agreement', 'request__maker'
+            "request__client", "request__loan_agreement", "request__maker"
         )
 
         if query:
             queryset = queryset.filter(
-                Q(request__request_number__icontains=query) |
-                Q(request__loan_agreement__contract_number__icontains=query) |
-                Q(request__client__eik__icontains=query) |
-                Q(request__client__name__icontains=query) |
-                Q(request__maker__first_name__icontains=query) |
-                Q(request__maker__last_name__icontains=query)
+                Q(request__request_number__icontains=query)
+                | Q(request__loan_agreement__contract_number__icontains=query)
+                | Q(request__client__eik__icontains=query)
+                | Q(request__client__name__icontains=query)
+                | Q(request__maker__first_name__icontains=query)
+                | Q(request__maker__last_name__icontains=query)
             )
+
+        queryset = queryset.order_by("request__request_number")
 
         data = []
         for annex in queryset:
@@ -115,23 +117,36 @@ class AnnexStatusReportView(LoginRequiredMixin, GroupRequiredMixin, View):
             contract = req.loan_agreement
             num_unsuccessful_attempts = annex.send_attempts - 1
 
-            data.append({
-                "Номер на заявка": req.request_number,
-                "Номер на договор": contract.contract_number if contract else '',
-                "Номер на анекс": annex.annex_number,
-                "Име на клиент": client.name if client else '',
-                "ЕИК на клиент": client.eik if client else '',
-                "Дата изготвяне": req.preparation_date.strftime("%Y-%m-%d") if req.preparation_date else '',
-                "Корекции по анекса": "Да" if req.correction_required else "Не",
-                "Дата подписване": req.signing_date.strftime("%Y-%m-%d") if req.signing_date else '',
-                "Брой неуспешни опити": num_unsuccessful_attempts if annex.send_attempts > 0 else "-",
-                "Изпълнител": req.maker.get_full_name() if req.maker else '',
-            })
+            data.append(
+                {
+                    "Номер на заявка": req.request_number,
+                    "Номер на договор": contract.contract_number if contract else "",
+                    "Номер на анекс": annex.annex_number,
+                    "Име на клиент": client.name if client else "",
+                    "ЕИК на клиент": client.eik if client else "",
+                    "Дата изготвяне": (
+                        req.preparation_date.strftime("%Y-%m-%d")
+                        if req.preparation_date
+                        else ""
+                    ),
+                    "Корекции по анекса": "Да" if req.correction_required else "Не",
+                    "Дата подписване": (
+                        req.signing_date.strftime("%Y-%m-%d")
+                        if req.signing_date
+                        else ""
+                    ),
+                    "Брой неуспешни опити": (
+                        num_unsuccessful_attempts if annex.send_attempts > 0 else "-"
+                    ),
+                    "Изпълнител": req.maker.get_full_name() if req.maker else "",
+                }
+            )
 
-        if export == 'excel':
+        if export == "excel":
             headers = list(data[0].keys()) if data else []
             rows = [list(row.values()) for row in data]
-            return export_report_to_excel(headers, rows, 'annex_status_report')
+            return export_report_to_excel(headers, rows, "annex_status_report")
 
-        return render(request, 'reports/annex_status_report.html', {'report_data': data})
-
+        return render(
+            request, "reports/annex_status_report.html", {"report_data": data}
+        )
