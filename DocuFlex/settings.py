@@ -173,3 +173,5 @@ MESSAGE_TAGS = {
 }
 
 SIGNING_API_URL = os.getenv("SIGNING_API_URL", "http://localhost:8000/api/mock-sign/")
+
+CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', cast=Csv())
