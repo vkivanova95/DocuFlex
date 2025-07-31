@@ -12,7 +12,10 @@ __pycache__/
 db.sqlite3
 db_backups/
 media/
-static/
+static/*
+!static/img/
+!static/img/xbank-logo.png
+/staticfiles/
 
 # Environment
 .env
@@ -34,4 +37,3 @@ env/
  # Tests / coverage
 .coverage
 htmlcov/
-
