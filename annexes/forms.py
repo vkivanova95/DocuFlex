@@ -12,9 +12,12 @@ class BaseAnnexStartForm(forms.Form):
     annex_number = forms.CharField(
         label="Анекс №", widget=forms.TextInput(attrs={"class": "form-control"})
     )
-    annex_date = styled_datefield(label="Анекс дата")
+    annex_date = styled_datefield(label="Дата подпис")
     city = forms.CharField(
-        label="Град", widget=forms.TextInput(attrs={"class": "form-control"})
+        label="Място подпис",
+        widget=forms.TextInput(
+            attrs={"class": "form-control", "placeholder": "напр. София"}
+        ),
     )
 
 

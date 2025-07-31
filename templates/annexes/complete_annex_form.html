@@ -24,12 +24,12 @@
             {{ form.annex_number.as_hidden }}
           </div>
           <div class="col-md-3 mb-3">
-            <label class="form-label">Анекс дата:</label>
+            <label class="form-label">Дата подпис:</label>
             <input type="text" class="form-control" value="{{ form.annex_date.value }}" disabled>
             {{ form.annex_date.as_hidden }}
           </div>
           <div class="col-md-3 mb-3">
-            <label class="form-label">Град:</label>
+            <label class="form-label">Място подпис:</label>
             <input type="text" class="form-control" value="{{ form.city.value }}" disabled>
             {{ form.city.as_hidden }}
           </div>
@@ -47,7 +47,7 @@
           <div class="row">
           <h5 class="mt-4">I. Промени в размера и валутата на кредита:</h5>
             <div class="col-md-4 mb-3">
-              <label class="form-label" for="{{ form.new_amount_reduction.id_for_label }}">Сума на намаление</label>
+              <label class="form-label" for="{{ form.new_amount_reduction.id_for_label }}">Нов размер след намаление</label>
               {{ form.new_amount_reduction }}
               {{ form.new_amount_reduction.errors }}
             </div>
