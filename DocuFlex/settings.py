@@ -178,6 +178,9 @@ MESSAGE_TAGS = {
     messages.ERROR: "danger",
 }
 
-SIGNING_API_URL = os.getenv("SIGNING_API_URL", "http://localhost:8000/api/mock-sign/")
+if DEBUG:
+    SIGNING_API_URL = "http://localhost:8000/api/mock-sign/"
+else:
+    SIGNING_API_URL = os.getenv("SIGNING_API_URL", "https://docuflex-a5c5ejdcgzhtgzht.italynorth-01.azurewebsites.net/api/mock-sign/")
 
 CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', cast=Csv())
