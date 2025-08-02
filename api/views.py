@@ -1,3 +1,5 @@
+import logging
+
 from asgiref.sync import sync_to_async
 import httpx, base64, os
 from django.conf import settings
@@ -17,6 +19,9 @@ from logs.choices import ActionType
 
 
 class MockSignAnnexView(APIView):
+    def get(self, request, *args, **kwargs):
+        return Response({"message": "Mock sign view is up and running"}, status=200)
+
     def post(self, request, *args, **kwargs):
         # симулиране случайно подписване
         success = random.choice([True, False])
@@ -43,6 +48,9 @@ class MockSignAnnexView(APIView):
 class SendGeneratedAnnexView(View):
     async def get(self, request, pk):
         def get_annex_and_check_permission():
+            logger = logging.getLogger(__name__)
+            logger.info(f"Used SIGNING_API_URL: {settings.SIGNING_API_URL}")
+
             annex = GeneratedAnnex.objects.select_related("request").get(pk=pk)
             if annex.request.maker != request.user and not request.user.is_superuser:
                 return annex, False
