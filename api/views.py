@@ -114,9 +114,18 @@ class SendGeneratedAnnexView(View):
         try:
             async with httpx.AsyncClient() as client:
                 response = await client.post(settings.SIGNING_API_URL, json=payload)
-                data = response.json()
-                status_result = data.get("status")
-                message = data.get("message")
+                print(">>> SIGNING_API_URL:", settings.SIGNING_API_URL)
+                print(">>> RESPONSE STATUS:", response.status_code)
+                print(">>> RESPONSE TEXT:", response.text)
+
+                try:
+                    data = response.json()
+                except Exception as e:
+                    print(">>> ERROR parsing JSON:", str(e))
+                    data = {}
+
+                status_result = data.get("status", "error")
+                message = data.get("message") or "Сървърът не върна съобщение или отговорът беше празен."
                 is_success = status_result == "success"
 
                 # Промяна на статус на заявката, ако е успешно
