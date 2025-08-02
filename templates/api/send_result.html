@@ -3,11 +3,25 @@
 {% block content %}
 <div class="card p-4 shadow-sm">
     <h4>Резултат от изпращането</h4>
-    {% if status == 'success' %}
-        <div class="alert alert-success">{{ message }}</div>
-    {% else %}
-        <div class="alert alert-danger">{{ message }}</div>
-    {% endif %}
-    <a href="{% url 'annexes:annex_archive' %}" class="btn btn-outline-primary mt-2">⬅️ Назад към Регистър на изготвените анекси</a>
+    <div class="alert
+            {% if status == 'success' %}
+                alert-success
+            {% elif status == 'info' %}
+                alert-info
+            {% elif status == 'warning' %}
+                alert-warning
+            {% else %}
+                alert-danger
+            {% endif %}">
+        {% if message %}
+            {{ message|safe }}
+        {% else %}
+            Анексът беше подписан успешно (няма съобщение от сървъра).
+        {% endif %}
+    </div>
+    <a href="{% url 'annexes:annex_archive' %}" class="btn btn-outline-primary mt-2">
+        ⬅️ Назад към Регистър на изготвените анекси
+    </a>
 </div>
+
 {% endblock %}

@@ -144,7 +144,7 @@ class GenerateAnnexView(
             req.preparation_date = now()
             req.save()
 
-            download_url = request.build_absolute_uri(annex_obj.file_path.url)
+            download_url = annex_obj.file_path.url
 
             messages.success(
                 request,
