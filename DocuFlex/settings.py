@@ -149,6 +149,12 @@ if DEBUG:
 # Production (когато DEBUG=False)
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+        "OPTIONS": {
+            "location": os.path.join(BASE_DIR, "media"),
+        },
+    },
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
