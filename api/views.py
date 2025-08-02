@@ -94,7 +94,7 @@ class SendGeneratedAnnexView(View):
             )
 
         # зареждане и изпращане на файла
-        file_path = os.path.join(settings.MEDIA_ROOT, annex.file_path.name)
+        file_path = os.path.join(settings.MEDIA_ROOT, str(annex.file_path))
         try:
             with open(file_path, "rb") as f:
                 file_bytes = await sync_to_async(f.read)()
