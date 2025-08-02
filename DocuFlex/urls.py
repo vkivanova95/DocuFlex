@@ -19,15 +19,19 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.views.static import serve
+from django.urls import re_path
 
 urlpatterns = [
+    # Основни
     path("", include("news.urls")),
     path("admin/", admin.site.urls),
     path("users/", include(("users.urls", "users"), namespace="users")),
     path(
         "home/", include("common.urls")
-    ),  # начална страница за работа в DocuFlex след login
-    # Останалите аппове (изискват login)
+    ),  # начална страница след login
+
+    # Основна функционалност (всичко изисква login)
     path("clients/", include("clients.urls", namespace="clients")),
     path("contracts/", include("contracts.urls", namespace="contracts")),
     path(
@@ -40,3 +44,16 @@ urlpatterns = [
     path("logs/", include("logs.urls", namespace="logs")),
     path("api/", include("api.urls", namespace="api")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+urlpatterns += [
+    re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
+]
+
+# За media файлове – development (DEBUG=True)
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+else:
+    # За production (Azure Web App)
+    urlpatterns += [
+        re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
+    ]
