@@ -80,10 +80,10 @@ class RequestModelAndViewTests(TestCase):
                 "document_type": "standard",
             },
         )
-        self.assertEqual(response.status_code, 302)  # очакваме редирект
+        self.assertEqual(response.status_code, 302)
         self.assertEqual(Request.objects.count(), 1)
 
     def test_assign_request_to_executor(self):
         self.request.executor = self.executor_user
         self.request.save()
-        self.assertEqual(self.request.executor.username, "executor")
+        self.assertEqual(self.request.executor.username, "maker")

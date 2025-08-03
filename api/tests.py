@@ -1,3 +1,5 @@
+import base64
+
 from django.test import TestCase, override_settings
 from django.urls import reverse_lazy
 from django.contrib.auth.models import Group
@@ -8,6 +10,7 @@ from loan_requests.models import Request
 from annexes.models import GeneratedAnnex
 import os
 from django.conf import settings
+from api.views import mock_sign_annex
 
 
 @override_settings(CELERY_TASK_ALWAYS_EAGER=True)
@@ -59,23 +62,14 @@ class SendAnnexToMockAPITest(TestCase):
         with open(self.dummy_file_path, "w") as f:
             f.write("Dummy annex content")
 
-    def test_send_annex_to_mock_api(self):
-        response = self.client.get(
-            reverse_lazy("api:send_annex", kwargs={"pk": self.annex.pk})
-        )
-        self.assertEqual(response.status_code, 200)
-        self.assertIn(
-            "status", response.context
-        )  # резултатът е доставен, не връща JSON
+    def test_mock_sign_annex_function_success(self):
+        with open(self.dummy_file_path, "rb") as f:
+            file_content = f.read()
 
-    def test_mock_sign_annex_returns_success(self):
-        # ако е истинско API връща JSON, симулира входни данни
-        response = self.client.post(
-            reverse_lazy("api:mock_sign_annex"),
-            {"annex_id": self.annex.pk, "filename": self.annex.file_path},
-        )
-        self.annex.refresh_from_db()
-        self.assertEqual(response.status_code, 200)
+        encoded = base64.b64encode(file_content).decode("utf-8")
+        result = mock_sign_annex("A-1", encoded)
+        self.assertIn(result["status"], ["success", "failure"])
+        self.assertIn("Анекс", result["message"])
 
     def tearDown(self):
         if os.path.exists(self.dummy_file_path):

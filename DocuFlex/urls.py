@@ -27,10 +27,7 @@ urlpatterns = [
     path("", include("news.urls")),
     path("admin/", admin.site.urls),
     path("users/", include(("users.urls", "users"), namespace="users")),
-    path(
-        "home/", include("common.urls")
-    ),  # начална страница след login
-
+    path("home/", include("common.urls")),  # начална страница след login
     # Основна функционалност (всичко изисква login)
     path("clients/", include("clients.urls", namespace="clients")),
     path("contracts/", include("contracts.urls", namespace="contracts")),
@@ -46,7 +43,7 @@ urlpatterns = [
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 urlpatterns += [
-    re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
+    re_path(r"^media/(?P<path>.*)$", serve, {"document_root": settings.MEDIA_ROOT}),
 ]
 
 # За media файлове – development (DEBUG=True)
@@ -55,5 +52,5 @@ if settings.DEBUG:
 else:
     # За production (Azure Web App)
     urlpatterns += [
-        re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
+        re_path(r"^media/(?P<path>.*)$", serve, {"document_root": settings.MEDIA_ROOT}),
     ]

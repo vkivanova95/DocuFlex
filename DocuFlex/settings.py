@@ -17,7 +17,6 @@ import os
 from django.conf.global_settings import ALLOWED_HOSTS
 from django.contrib.messages import constants as messages
 from dotenv import load_dotenv
-import logging
 import sys
 
 load_dotenv()
@@ -34,7 +33,7 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config("DEBUG", cast=bool)
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
+ALLOWED_HOSTS = config("ALLOWED_HOSTS", cast=Csv())
 
 # Application definition
 PROJECT_APPS = [
@@ -184,35 +183,7 @@ MESSAGE_TAGS = {
 
 SIGNING_API_URL = os.getenv(
     "SIGNING_API_URL",
-    "https://docuflex-a5c5ejdcgzhtgzht.italynorth-01.azurewebsites.net/api/mock-sign/"
+    "https://docuflex-a5c5ejdcgzhtgzht.italynorth-01.azurewebsites.net/api/mock-sign/",
 )
 
-CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', cast=Csv())
-
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,  # keep default Django loggers
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-            'stream': sys.stdout,  # Azure captures stdout
-        },
-    },
-    'root': {
-        'handlers': ['console'],
-        'level': 'INFO',  # or DEBUG if you want more verbose logs
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['console'],
-            'level': 'INFO',
-            'propagate': False,
-        },
-        # Your custom logger, optional
-        'docuflex': {
-            'handlers': ['console'],
-            'level': 'DEBUG',
-            'propagate': False,
-        },
-    },
-}
+CSRF_TRUSTED_ORIGINS = config("CSRF_TRUSTED_ORIGINS", cast=Csv())

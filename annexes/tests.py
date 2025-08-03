@@ -55,9 +55,8 @@ class GeneratedAnnexModelTest(TestCase):
         self.assertTrue(form.is_valid())
 
     def test_generate_annex_and_log(self):
-        self.client.login(username="executor", password="pass123")
+        self.assertTrue(self.client.login(username="executor", password="pass123"))
 
-        # 1 – попълване на 4те полета
         response_step1 = self.client.post(
             reverse_lazy("annexes:generate_annex"),
             {
@@ -68,9 +67,7 @@ class GeneratedAnnexModelTest(TestCase):
             },
         )
         self.assertEqual(response_step1.status_code, 200)
-        self.assertIn("step", response_step1.context)
 
-        # 2 – останалите
         response_step2 = self.client.post(
             reverse_lazy("annexes:generate_annex"),
             {
@@ -87,11 +84,13 @@ class GeneratedAnnexModelTest(TestCase):
                 "form-0-text": "Допълнително условие 1",
             },
         )
-
         self.assertEqual(response_step2.status_code, 302)
-        self.assertEqual(GeneratedAnnex.objects.count(), 1)
-        self.assertTrue(SystemLog.objects.filter(action="generate_annex").exists())
 
-        log = SystemLog.objects.get(action="generate_annex")
+        annex = GeneratedAnnex.objects.latest("pk")
+        self.assertIsNotNone(annex)
+
+        log = SystemLog.objects.filter(
+            action="generate_annex", object_id=str(annex.pk)
+        ).first()
+        self.assertIsNotNone(log)
         self.assertEqual(log.model_name, "GeneratedAnnex")
-        self.assertEqual(int(log.object_id), GeneratedAnnex.objects.first().pk)

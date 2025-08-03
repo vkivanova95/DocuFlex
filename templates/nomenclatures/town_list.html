@@ -12,7 +12,7 @@
 </p>
     <!-- Търсене -->
     <form method="get" class="input-group mb-4">
-        <input type="text" name="q" class="form-control" placeholder="Търси по тип име на града" value="{{ query }}">
+        <input type="text" name="q" class="form-control" placeholder="Търси по име на града" value="{{ query }}">
         <input type="hidden" name="per_page" value="{{ per_page }}">
         <button type="submit" class="btn btn-outline-primary me-2">🔍 Търси</button>
         <a href="{% url 'nomenclatures:town_list' %}" class="btn btn-outline-danger">❌ Изчисти</a>

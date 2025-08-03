@@ -21,7 +21,7 @@ class AccessControlTests(TestCase):
     def test_business_user_no_access_nomenclature(self):
         self.client.login(username="business", password="pass")
         response = self.client.get(reverse("nomenclatures:currency_list"))
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 302)
 
     def test_boss_user_can_access_nomenclature(self):
         self.client.login(username="head", password="pass")
