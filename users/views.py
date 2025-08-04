@@ -59,15 +59,7 @@ class ForcePasswordChangeView(LoginRequiredMixin, FormView):
 
 class UserDashboardView(LoginRequiredMixin, GroupRequiredMixin, TemplateView):
     template_name = "users/user-dashboard.html"
-    allowed_groups = [GROUP_MANAGER]
-
-    def test_func(self):
-        return (
-            self.request.user.is_superuser
-            or self.request.user.groups.filter(
-                name__in=[GROUP_MANAGER, "admin"]
-            ).exists()
-        )
+    allowed_groups = [GROUP_MANAGER, "admin"]
 
 
 class UserCreateView(LoginRequiredMixin, GroupRequiredMixin, View):
